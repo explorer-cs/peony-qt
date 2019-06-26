@@ -12,7 +12,7 @@ TARGET = peony-qt
 
 TEMPLATE = app
 
-PKGCONFIG +=gio-2.0 glib-2.0 gio-unix-2.0
+PKGCONFIG +=gio-2.0 glib-2.0 gio-unix-2.0 libfm-qt
 LIBS +=-lgio-2.0 -lglib-2.0 -lX11
 CONFIG += c++11 link_pkgconfig no_keywords
 
@@ -30,9 +30,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     peony-application.cpp \
     peony-main.cpp \
+    libfmqtdemo.cpp
 
 HEADERS += \
     peony-application.h \
+    libfmqtdemo.h
 
 INCLUDEPATH    += ../plugin-iface
 

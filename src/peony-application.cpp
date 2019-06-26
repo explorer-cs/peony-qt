@@ -6,7 +6,18 @@
 #include <QPluginLoader>
 #include <QString>
 
+#include "libfmqtdemo.h"
+
+static void testPlugin();
+static void testLibFm();
+
 PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc, argv)
+{
+    testLibFm();
+    //testPlugin();
+}
+
+void testPlugin()
 {
     //check if first run
     //if not send message to server
@@ -36,4 +47,9 @@ PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc,
         }
         qDebug()<<"testEnd";
     }
+}
+
+void testLibFm()
+{
+    LibFmQtDemo *demo = new LibFmQtDemo;
 }
