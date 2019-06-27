@@ -6,15 +6,21 @@
 #include <QPluginLoader>
 #include <QString>
 
-#include "libfmqtdemo.h"
+#include "peony-navigation-window.h"
+#include "peony-tool-bar.h"
 
 static void testPlugin();
-static void testLibFm();
 
 PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc, argv)
 {
-    testLibFm();
+    QIcon::setThemeName("ukui-icon-theme");
+    //testLibFm();
     //testPlugin();
+
+    PeonyNavigationWindow *w1 = new PeonyNavigationWindow;
+    w1->initLayout();
+    w1->resize(1000,618);
+    w1->show();
 }
 
 void testPlugin()
@@ -47,9 +53,4 @@ void testPlugin()
         }
         qDebug()<<"testEnd";
     }
-}
-
-void testLibFm()
-{
-    LibFmQtDemo *demo = new LibFmQtDemo;
 }

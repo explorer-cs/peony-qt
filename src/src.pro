@@ -30,11 +30,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     peony-application.cpp \
     peony-main.cpp \
-    libfmqtdemo.cpp
+    peony-navigation-window.cpp \
+    peony-tool-bar.cpp \
+    border-layout.cpp \
+    peony-folder-view.cpp \
+    peony-status-bar.cpp \
+    peony-location-bar.cpp
 
 HEADERS += \
     peony-application.h \
-    libfmqtdemo.h
+    peony-navigation-window.h \
+    peony-tool-bar.h \
+    border-layout.h \
+    peony-folder-view.h \
+    peony-status-bar.h \
+    peony-location-bar.h
 
 INCLUDEPATH    += ../plugin-iface
 
