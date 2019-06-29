@@ -16,7 +16,14 @@ void PeonyStatusBar::createStatusBar()
     QHBoxLayout *hLayout = new QHBoxLayout(this);
 
     QLabel *statusLabel = new QLabel("status bar", this);
+    m_label = statusLabel;
     hLayout->addWidget(statusLabel, 0, Qt::AlignCenter);
 
     setLayout(hLayout);
+}
+
+void PeonyStatusBar::updateStatusBarStatus(QString string)
+{
+    if (m_label != nullptr)
+        m_label->setText(string);
 }

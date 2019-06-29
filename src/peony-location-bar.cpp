@@ -38,6 +38,7 @@ void PeonyLocationSearchBar::createLocationSearchBar()
 
     //we must ensure that cd Up Action is disable in location "/"
     QAction *cdUpAction = new QAction(QIcon::fromTheme("gtk-go-up"), "cd Up", navigationToolBar);
+    connect(cdUpAction, &QAction::triggered, [=](){Q_EMIT this->cdUpRequest();});
     navigationToolBar->addAction(cdUpAction);
 
     QAction *reloadAction = new QAction(QIcon::fromTheme("gtk-refresh"), "Refresh", navigationToolBar);
@@ -47,6 +48,7 @@ void PeonyLocationSearchBar::createLocationSearchBar()
 
     //path bar, use setText slot get current path?
     QLineEdit *pathEntry = new QLineEdit(this);
+    m_location_edit_line = pathEntry;
     QAction *goToAction = new QAction(QIcon::fromTheme("gtk-go-down"), "", pathEntry);
     pathEntry->addAction(goToAction, QLineEdit::TrailingPosition);
     hLayout->addWidget(pathEntry, 20);
@@ -60,4 +62,10 @@ void PeonyLocationSearchBar::createLocationSearchBar()
     hLayout->addWidget(viewToolBar, 0, Qt::AlignRight);
 
     is_location_search_bar_created = true;
+}
+
+void PeonyLocationSearchBar::updateLocatonBarStatus(QString string)
+{
+    if (m_location_edit_line != nullptr)
+        m_location_edit_line->setText(string);
 }

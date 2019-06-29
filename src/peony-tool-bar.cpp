@@ -10,6 +10,8 @@
 
 #include <QLineEdit>
 
+#include <QDebug>
+
 PeonyToolBar::PeonyToolBar(QWidget *parent) : QWidget(parent)
 {
 
@@ -33,6 +35,9 @@ void PeonyToolBar::createToolBar()
     newDirectoryAction->setShortcuts(QKeySequence::New);
     newDirectoryAction->setStatusTip("New a folder");
     //connect action trigged signal
+    newDirectoryAction->setShortcut(QKeySequence::Copy);//just a test for shortcut
+    connect(newDirectoryAction, &QAction::triggered, [=](){qDebug()<<"request create folder";Q_EMIT this->createFolderRequest();});
+
     toolBar->addAction(newDirectoryAction);
 
     const QIcon newWindowIcon = QIcon::fromTheme("gtk-new", QIcon::fromTheme("add"));
@@ -42,6 +47,7 @@ void PeonyToolBar::createToolBar()
     toolBar->addAction(newWindowIconAction);
 
     QAction *openInTerminalAction = new QAction(QIcon::fromTheme("terminal"), "Opem in terminal", this);
+    connect(openInTerminalAction, &QAction::triggered, [=](){Q_EMIT this->openInTerminalRequest();});
     toolBar->addAction(openInTerminalAction);
 
     toolBar->addSeparator();
@@ -52,10 +58,12 @@ void PeonyToolBar::createToolBar()
     QAction *selectViewAction = new QAction(currentViewIcon, "add", this);
 
     QMenu *viewSelectMenu = new QMenu(this);
-    QAction *iconViewAction = new QAction(QIcon::fromTheme("gtk-go-up"), "Icon View", viewSelectMenu);
-    viewSelectMenu->addAction(iconViewAction);
-    QAction *chooseIconViewAction = new QAction(QIcon::fromTheme("gtk-go-down"), "List View", viewSelectMenu);
+    QAction *chooseIconViewAction = new QAction(QIcon::fromTheme("gtk-go-up"), "Icon View", viewSelectMenu);
+    connect(chooseIconViewAction, &QAction::triggered, [=](){Q_EMIT this->changeViewModeRequest(Fm::FolderView::IconMode);});
     viewSelectMenu->addAction(chooseIconViewAction);
+    QAction *chooseListViewAction = new QAction(QIcon::fromTheme("gtk-go-down"), "List View", viewSelectMenu);
+    connect(chooseListViewAction, &QAction::triggered, [=](){Q_EMIT this->changeViewModeRequest(Fm::FolderView::DetailedListMode);});
+    viewSelectMenu->addAction(chooseListViewAction);
     selectViewAction->setMenu(viewSelectMenu);
     toolBar->addAction(selectViewAction);
 
@@ -63,7 +71,9 @@ void PeonyToolBar::createToolBar()
     QAction *sortAction = new QAction(QIcon::fromTheme("gtk-sort-ascending"), "Sort Ascending", this);
     QMenu *sortMenu = new QMenu(this);
     QAction *sortByName = new QAction("By Name", sortMenu);
+    connect(sortByName, &QAction::triggered, [=](){Q_EMIT this->changeSortModeRequest(Fm::FolderModel::ColumnFileName);});
     QAction *sortByType = new QAction("By Type", sortMenu);
+    connect(sortByType, &QAction::triggered, [=](){Q_EMIT this->changeSortModeRequest(Fm::FolderModel::ColumnFileType);});
     QList<QAction*> sortMenuActions;
     sortMenu->addActions(sortMenuActions<<sortByName<<sortByType);
     sortAction->setMenu(sortMenu);
@@ -73,23 +83,30 @@ void PeonyToolBar::createToolBar()
     toolBar->addSeparator();
 
     QAction *copyAction = new QAction(QIcon::fromTheme("gtk-copy"), "Copy", this);
+    connect(copyAction, &QAction::triggered, [=](){Q_EMIT this->copyToClipboardRequest();});
     QAction *pasteAction = new QAction(QIcon::fromTheme("gtk-paste"), "Paste", this);
+    connect(pasteAction, &QAction::triggered, [=](){Q_EMIT this->pasteFromClipboardRequest();});
     QAction *cutAction = new QAction(QIcon::fromTheme("gtk-cut"), "Cut", this);
+    connect(cutAction, &QAction::triggered, [=](){Q_EMIT this->cutToClipboradRequest();});
     QList<QAction*> fileOpActions;
     toolBar->addActions(fileOpActions<<copyAction<<pasteAction<<cutAction);
 
     //delete or trash?
     toolBar->addSeparator();
     QAction *deleteAction = new QAction(QIcon::fromTheme("gtk-close"), "Delete", this);
+    connect(deleteAction, &QAction::triggered, [=](){Q_EMIT this->deleteSelectionRequest();});
     toolBar->addAction(deleteAction);
 
     //share, burrner and archive
     toolBar->addSeparator();
     QAction *shareAction = new QAction(QIcon::fromTheme("gtk-share"), "Share", this);
-    QAction *burrnerAction = new QAction(QIcon::fromTheme("gtk-cdrom"), "Burrner", this);
+    connect(shareAction, &QAction::triggered, [=](){Q_EMIT this->shareSelectionRequest();});
+    QAction *burnAction = new QAction(QIcon::fromTheme("gtk-cdrom"), "Burrner", this);
+    connect(burnAction, &QAction::triggered, [=](){Q_EMIT this->burnRequest();});
     QAction *archiveAction = new QAction(QIcon::fromTheme("add-files-to-archive"), "Archive", this);
+    connect(archiveAction, &QAction::triggered, [=](){Q_EMIT this->archiveSeletionRequest();});
     QList<QAction*> additionalActions;
-    toolBar->addActions(additionalActions<<shareAction<<burrnerAction<<archiveAction);
+    toolBar->addActions(additionalActions<<shareAction<<burnAction<<archiveAction);
 
     toolBar->addSeparator();
     QAction *moreAction = new QAction(QIcon::fromTheme("system-run"), "More", this);

@@ -2,13 +2,17 @@
 
 #include <libfm-qt/foldermodel.h>
 #include <libfm-qt/cachedfoldermodel.h>
+#include <libfm-qt/filelauncher.h>
 
 #include <QDebug>
+
+static int clicked_count = 0;
 
 PeonyFolderView::PeonyFolderView(QWidget *parent) : Fm::FolderView(parent)
 {
     Fm::FilePath home = Fm::FilePath::homeDir();
     Fm::CachedFolderModel* model = Fm::CachedFolderModel::modelFromPath(home);
+    m_cache_model = model;
     Fm::ProxyFolderModel *proxy_model = new Fm::ProxyFolderModel();
     proxy_model->sort(Fm::FolderModel::ColumnFileName, Qt::AscendingOrder);
     proxy_model->setSourceModel(model);
@@ -24,28 +28,28 @@ PeonyFolderView::PeonyFolderView(QWidget *parent) : Fm::FolderView(parent)
 
 void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::FileInfo>& fileInfo)
 {
-    qDebug()<<type;
+    clicked_count++;
+    qDebug()<<clicked_count;
     switch (type) {
     case 0:
         if (fileInfo->isDir()){
-            qDebug()<<type<<fileInfo->name().c_str();
-            fileInfo->path().toString();
-            m_model->setFolder(Fm::Folder::fromPath(fileInfo->path()));
-            fileInfo->path().parent();
-            //m_model->setFolder(Fm::Folder::fromPath(Fm::FilePath::fromUri("trash:///")));
-            //m_model->setFolder(Fm::Folder::fromPath(fileInfo->path().parent()));
-            break;
+            qDebug()<<type<<fileInfo->name().c_str()<<fileInfo->name().length();
+            if (clicked_count%2 == 0)
+                m_model->setFolder(Fm::Folder::fromPath(fileInfo->path()));
         } else {
-            //if (m_model->path().parent().isValid())
-            //    m_model->setFolder(Fm::Folder::fromPath(m_model->path().parent()));
-            //Fm::FolderView::onFileClicked(type, fileInfo);
+            Fm::FileInfoList file_list;
+            file_list.push_back(fileInfo);
+            fileLauncher()->launchFiles(this, file_list);
         }
         break;
+    case 1:
+        //open in new window
+        break;
     case 2:
-        //return Fm::FolderView::onFileClicked(type, fileInfo);
-        //break;
+        if (clicked_count%2 == 1)
+            Fm::FolderView::onFileClicked(type, fileInfo);
+        break;
     default:
-        Fm::FolderView::onFileClicked(type, fileInfo);
         break;
     }
 }

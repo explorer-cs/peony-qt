@@ -5,6 +5,7 @@
 #include <libfm-qt/foldermodel.h>
 
 #include <libfm-qt/proxyfoldermodel.h>
+#include <libfm-qt/cachedfoldermodel.h>
 
 class PeonyFolderView : public Fm::FolderView
 {
@@ -17,6 +18,7 @@ public Q_SLOTS:
 private:
     Fm::FolderModel *m_model = nullptr;
     Fm::ProxyFolderModel *m_proxy_model = nullptr;
+    Fm::CachedFolderModel *m_cache_model = nullptr;
 };
 
 #endif // PEONYFOLDERVIEW_H

@@ -19,6 +19,7 @@ PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc,
 
     PeonyNavigationWindow *w1 = new PeonyNavigationWindow;
     w1->initLayout();
+    w1->initSignal();
     w1->resize(1000,618);
     w1->show();
 }
