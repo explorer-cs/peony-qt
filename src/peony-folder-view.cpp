@@ -15,17 +15,17 @@ static int clicked_count = 0;
 PeonyFolderView::PeonyFolderView(QWidget *parent) : Fm::FolderView(parent)
 {
     Fm::FilePath home = Fm::FilePath::homeDir();
-    Fm::CachedFolderModel* model = Fm::CachedFolderModel::modelFromPath(home);
-    m_cache_model = model;
+    m_model = new Fm::FolderModel;
+    m_model->setFolder(Fm::Folder::fromPath(Fm::FilePath::homeDir()));
+
     Fm::ProxyFolderModel *proxy_model = new Fm::ProxyFolderModel();
     proxy_model->sort(Fm::FolderModel::ColumnFileName, Qt::AscendingOrder);
-    proxy_model->setSourceModel(model);
+    proxy_model->setSourceModel(m_model);
 
     proxy_model->setThumbnailSize(64);
     proxy_model->setShowThumbnails(true);
 
     this->setModel(proxy_model);
-    m_model = model;
     m_proxy_model = proxy_model;
 
     //in libfmqt, when mouse move above, will draw a symbol at left-top of icon grid.

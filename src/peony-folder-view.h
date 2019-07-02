@@ -23,7 +23,7 @@ Q_SIGNALS:
 private:
     Fm::FolderModel *m_model = nullptr;
     Fm::ProxyFolderModel *m_proxy_model = nullptr;
-    Fm::CachedFolderModel *m_cache_model = nullptr;
+    //Fm::CachedFolderModel *m_cache_model = nullptr;
 };
 
 #endif // PEONYFOLDERVIEW_H

@@ -6,7 +6,7 @@
     <message>
         <location filename="peony-location-bar.cpp" line="32"/>
         <source>Go Back</source>
-        <translation type="unfinished">后退</translation>
+        <translation>后退</translation>
     </message>
     <message>
         <location filename="peony-location-bar.cpp" line="36"/>
