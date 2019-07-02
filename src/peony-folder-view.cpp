@@ -4,6 +4,10 @@
 #include <libfm-qt/cachedfoldermodel.h>
 #include <libfm-qt/filelauncher.h>
 
+#include <libfm-qt/folderview_p.h>
+
+#include <QStyledItemDelegate>
+
 #include <QDebug>
 
 static int clicked_count = 0;
@@ -23,7 +27,19 @@ PeonyFolderView::PeonyFolderView(QWidget *parent) : Fm::FolderView(parent)
     this->setModel(proxy_model);
     m_model = model;
     m_proxy_model = proxy_model;
-    //this->setViewMode(Fm::FolderView::DetailedListMode);
+
+    //in libfmqt, when mouse move above, will draw a symbol at left-top of icon grid.
+    //symbol draw is controlled by delegate paint method. i try using normal delegate,
+    //but many bad things occur.
+    /*
+    QStyledItemDelegate *delegate = new QStyledItemDelegate;
+    connect(this, &Fm::FolderView::selChanged, [=](){
+        if (this->viewMode() == Fm::FolderView::IconMode){
+            Fm::FolderViewListView *view = static_cast<Fm::FolderViewListView*>(this->childView());
+            view->setItemDelegateForColumn(Fm::FolderModel::ColumnFileName, delegate);
+        }
+    });
+    */
 }
 
 void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::FileInfo>& fileInfo)

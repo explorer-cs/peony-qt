@@ -200,8 +200,10 @@ void PeonyNavigationWindow::goToPath(const Fm::FilePath &path)
 
 void PeonyNavigationWindow::updateLocationBarPath(Fm::FilePath path)
 {
-    if (m_location_bar)
+    if (m_location_bar) {
         m_location_bar->pathBar()->setPath(path);
+        m_status_bar->updateStatusBarStatus(path.baseName().get());
+    }
 }
 
 void PeonyNavigationWindow::goBack()

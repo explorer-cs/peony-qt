@@ -29,15 +29,15 @@ void PeonyLocationBar::createLocationBar()
 
     //navigation tool bar need synchronous the buttons' states, connect the history manager signal.
 
-    QAction *goBackAction = new QAction(QIcon::fromTheme("gtk-go-back"), "Go Back", navigationToolBar);
+    QAction *goBackAction = new QAction(QIcon::fromTheme("gtk-go-back"), tr("Go Back"), navigationToolBar);
     connect(goBackAction, &QAction::triggered, [=](){Q_EMIT this->backRequest();});
     navigationToolBar->addAction(goBackAction);
 
-    QAction *goForwardAction = new QAction(QIcon::fromTheme("gtk-go-forward"), "Go Forward", navigationToolBar);
+    QAction *goForwardAction = new QAction(QIcon::fromTheme("gtk-go-forward"), tr("Go Forward"), navigationToolBar);
     connect(goForwardAction, &QAction::triggered, this, &PeonyLocationBar::forwardRequest);
     navigationToolBar->addAction(goForwardAction);
 
-    QAction *listHistoryAction = new QAction(QIcon::fromTheme("gtk-go-down"), "List History", navigationToolBar);
+    QAction *listHistoryAction = new QAction(QIcon::fromTheme("gtk-go-down"), tr("List History"), navigationToolBar);
     QMenu *historyMenu = new QMenu(this);
     connect(listHistoryAction, &QAction::triggered, [=](){
         Q_EMIT this->historyMenuRequest(listHistoryAction, historyMenu);
@@ -45,11 +45,11 @@ void PeonyLocationBar::createLocationBar()
     navigationToolBar->addAction(listHistoryAction);
 
     //we must ensure that cd Up Action is disable in location "/"
-    QAction *cdUpAction = new QAction(QIcon::fromTheme("gtk-go-up"), "cd Up", navigationToolBar);
+    QAction *cdUpAction = new QAction(QIcon::fromTheme("gtk-go-up"), tr("cd Up"), navigationToolBar);
     connect(cdUpAction, &QAction::triggered, [=](){Q_EMIT this->cdUpRequest();});
     navigationToolBar->addAction(cdUpAction);
 
-    QAction *reloadAction = new QAction(QIcon::fromTheme("gtk-refresh"), "Refresh", navigationToolBar);
+    QAction *reloadAction = new QAction(QIcon::fromTheme("gtk-refresh"), tr("Refresh"), navigationToolBar);
     navigationToolBar->addAction(reloadAction);
 
     hLayout->addWidget(navigationToolBar);
@@ -68,9 +68,9 @@ void PeonyLocationBar::createLocationBar()
     */
 
     QToolBar *viewToolBar = new QToolBar(this);
-    QAction *previewAction = new QAction(QIcon::fromTheme("preview"), "Preview", viewToolBar);
-    QAction *iconViewAction = new QAction(QIcon::fromTheme("icon-view"), "Icon View", viewToolBar);
-    QAction *listViewAction = new QAction(QIcon::fromTheme("list-view"), "List View", viewToolBar);
+    QAction *previewAction = new QAction(QIcon::fromTheme("preview"), QAction::tr("Preview"), viewToolBar);
+    QAction *iconViewAction = new QAction(QIcon::fromTheme("icon-view"), tr("Icon View"), viewToolBar);
+    QAction *listViewAction = new QAction(QIcon::fromTheme("list-view"), tr("List View"), viewToolBar);
     QList<QAction*> viewToolBarActions;
     viewToolBar->addActions(viewToolBarActions<<previewAction<<iconViewAction<<listViewAction);
     hLayout->addWidget(viewToolBar, 0, Qt::AlignRight);

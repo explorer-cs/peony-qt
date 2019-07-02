@@ -14,7 +14,7 @@ TEMPLATE = app
 
 PKGCONFIG +=gio-2.0 glib-2.0 gio-unix-2.0 libfm-qt
 LIBS +=-lgio-2.0 -lglib-2.0 -lX11
-CONFIG += c++11 link_pkgconfig no_keywords
+CONFIG += c++11 link_pkgconfig no_keywords debug
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -26,6 +26,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
+TRANSLATIONS += peony-qt_zh_CN.ts
 
 SOURCES += \
     peony-application.cpp \
@@ -52,3 +54,8 @@ INCLUDEPATH    += ../plugin-iface
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES +=
+
+RESOURCES += \
+    translations.qrc
