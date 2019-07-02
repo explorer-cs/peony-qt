@@ -34,8 +34,13 @@ void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::Fi
     case 0:
         if (fileInfo->isDir()){
             qDebug()<<type<<fileInfo->name().c_str()<<fileInfo->name().length();
-            if (clicked_count%2 == 0)
-                m_model->setFolder(Fm::Folder::fromPath(fileInfo->path()));
+            if (clicked_count%2 == 0){
+                //m_model->setFolder(Fm::Folder::fromPath(fileInfo->path()));
+                //updatePathBarRequest will set folder, too.
+                //DO NOT setFolder here, otherwise every file in new directory will show twice.
+                Q_EMIT pushBackListRequest(this->path());
+                Q_EMIT updatePathBarRequest(fileInfo->path());
+            }
         } else {
             Fm::FileInfoList file_list;
             file_list.push_back(fileInfo);

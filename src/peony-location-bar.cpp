@@ -11,12 +11,14 @@
 
 #include <QLineEdit>
 
-PeonyLocationSearchBar::PeonyLocationSearchBar(QWidget *parent) : QWidget(parent)
+#include <libfm-qt/pathbar.h>
+
+PeonyLocationBar::PeonyLocationBar(QWidget *parent) : QWidget(parent)
 {
 
 }
 
-void PeonyLocationSearchBar::createLocationSearchBar()
+void PeonyLocationBar::createLocationBar()
 {
     if (is_location_search_bar_created)
         return;
@@ -28,12 +30,18 @@ void PeonyLocationSearchBar::createLocationSearchBar()
     //navigation tool bar need synchronous the buttons' states, connect the history manager signal.
 
     QAction *goBackAction = new QAction(QIcon::fromTheme("gtk-go-back"), "Go Back", navigationToolBar);
+    connect(goBackAction, &QAction::triggered, [=](){Q_EMIT this->backRequest();});
     navigationToolBar->addAction(goBackAction);
 
     QAction *goForwardAction = new QAction(QIcon::fromTheme("gtk-go-forward"), "Go Forward", navigationToolBar);
+    connect(goForwardAction, &QAction::triggered, this, &PeonyLocationBar::forwardRequest);
     navigationToolBar->addAction(goForwardAction);
 
     QAction *listHistoryAction = new QAction(QIcon::fromTheme("gtk-go-down"), "List History", navigationToolBar);
+    QMenu *historyMenu = new QMenu(this);
+    connect(listHistoryAction, &QAction::triggered, [=](){
+        Q_EMIT this->historyMenuRequest(listHistoryAction, historyMenu);
+    });
     navigationToolBar->addAction(listHistoryAction);
 
     //we must ensure that cd Up Action is disable in location "/"
@@ -47,11 +55,17 @@ void PeonyLocationSearchBar::createLocationSearchBar()
     hLayout->addWidget(navigationToolBar);
 
     //path bar, use setText slot get current path?
+    Fm::PathBar *pathBar = new Fm::PathBar(this);
+    m_path_bar = pathBar;
+    hLayout->addWidget(pathBar, 20);
+
+    /*
     QLineEdit *pathEntry = new QLineEdit(this);
     m_location_edit_line = pathEntry;
     QAction *goToAction = new QAction(QIcon::fromTheme("gtk-go-down"), "", pathEntry);
     pathEntry->addAction(goToAction, QLineEdit::TrailingPosition);
     hLayout->addWidget(pathEntry, 20);
+    */
 
     QToolBar *viewToolBar = new QToolBar(this);
     QAction *previewAction = new QAction(QIcon::fromTheme("preview"), "Preview", viewToolBar);
@@ -64,8 +78,13 @@ void PeonyLocationSearchBar::createLocationSearchBar()
     is_location_search_bar_created = true;
 }
 
-void PeonyLocationSearchBar::updateLocatonBarStatus(QString string)
+void PeonyLocationBar::updateLocationBarStatus(QString string)
 {
     if (m_location_edit_line != nullptr)
         m_location_edit_line->setText(string);
+}
+
+void PeonyLocationBar::updateLocationBarStatus(const Fm::FilePath &path)
+{
+    m_path_bar->setPath(path);
 }

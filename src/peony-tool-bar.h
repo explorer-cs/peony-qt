@@ -29,6 +29,8 @@ Q_SIGNALS:
     void burnRequest();
     void archiveSeletionRequest();
 
+    void searchRequest(QString key);
+
     //more
 
 private:

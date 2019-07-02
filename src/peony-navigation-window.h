@@ -10,7 +10,7 @@
 class BorderLayout;
 
 class PeonyToolBar;
-class PeonyLocationSearchBar;
+class PeonyLocationBar;
 class PeonyStatusBar;
 class PeonySideBar;
 
@@ -33,7 +33,7 @@ public:
     void goToUri(const char* uri);
     void goToPath(const QString &path);
     void goToPath(const char* path);
-    void goToPath(Fm::FilePath path);
+    void goToPath(const Fm::FilePath &path);
 
     Fm::FileInfoList getSelection();
     Fm::Folder getWindowFolder();
@@ -64,11 +64,14 @@ public Q_SLOTS:
     virtual void openInNewTab();//tab page doesn't support yet.
 
     void goToFolder(Fm::Folder *folder, bool createNewWindow);
+    */
     void goBack();
     void goForward();
-    */
+    void showHistoryMenu(QAction *listHistoryAction, QMenu *historyMenu);
+
     void cdUp();
     void updateLocationBarString(QString);
+    void updateLocationBarPath(Fm::FilePath path);
 
 private:
     void createToolBars();
@@ -78,12 +81,15 @@ private:
     BorderLayout *m_layout = nullptr;
     QSplitter *m_view_splitter = nullptr;
 
-    Fm::FolderView *m_folder_view = nullptr;
+    PeonyFolderView *m_folder_view = nullptr;
     PeonyToolBar *m_tool_bar = nullptr;
-    PeonyLocationSearchBar *m_location_bar = nullptr;
+    PeonyLocationBar *m_location_bar = nullptr;
     PeonySideBar *m_side_bar = nullptr;
     PeonyStatusBar *m_status_bar = nullptr;
     PeonyPreviewPane *m_preview_pane = nullptr;
+
+    Fm::FilePathList m_forward_list;
+    Fm::FilePathList m_backward_list;
 };
 
 #endif // PEONYNAVIGATIONWINDOW_H

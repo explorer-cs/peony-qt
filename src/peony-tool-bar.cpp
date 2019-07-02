@@ -123,6 +123,16 @@ void PeonyToolBar::createToolBar()
     QLineEdit *searchEntry = new QLineEdit(this);
     QAction *searchAction = new QAction(QIcon::fromTheme("search"), "search", searchEntry);
     searchEntry->addAction(searchAction, QLineEdit::TrailingPosition);
+    connect(searchEntry, &QLineEdit::returnPressed, searchAction, &QAction::trigger);
+    connect(searchAction, &QAction::triggered, [=](){
+        qDebug()<<"start search";
+        if (searchEntry->text().isEmpty())
+            return;
+
+        QString key = searchEntry->text();
+        Q_EMIT this->searchRequest(key);
+    });
+
     hLayout->addWidget(searchEntry, 0, Qt::AlignRight);
 
     //do not create again

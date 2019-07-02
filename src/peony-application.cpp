@@ -17,11 +17,20 @@ PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc,
     //testLibFm();
     //testPlugin();
 
+    //in libfmqt desgin, cache model is a static model shared by all window now, it is a serious problem.
+    //it is shared by every path bar, every folder view, that means our signal will change all window location in our desgin.
     PeonyNavigationWindow *w1 = new PeonyNavigationWindow;
     w1->initLayout();
     w1->initSignal();
     w1->resize(1000,618);
     w1->show();
+/*
+    PeonyNavigationWindow *w2 = new PeonyNavigationWindow;
+    w2->initLayout();
+    w2->initSignal();
+    w2->resize(1000,618);
+    w2->show();
+    */
 }
 
 void testPlugin()
