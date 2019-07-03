@@ -5,6 +5,7 @@
 #include <libfm-qt/filelauncher.h>
 
 #include <libfm-qt/folderview_p.h>
+#include <libfm-qt/mountoperation.h>
 
 #include <QStyledItemDelegate>
 
@@ -54,8 +55,39 @@ void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::Fi
                 //m_model->setFolder(Fm::Folder::fromPath(fileInfo->path()));
                 //updatePathBarRequest will set folder, too.
                 //DO NOT setFolder here, otherwise every file in new directory will show twice.
-                Q_EMIT pushBackListRequest(this->path());
-                Q_EMIT updatePathBarRequest(fileInfo->path());
+
+                //for remote locaiton, uri in file info is not target uri.
+                //use g_file_query_info qurey G_FILE_ATTRIBUTE_STANDARD_TARGET_URI
+                //and get it by g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI)
+                //at last, go to FilePath form target uri.
+
+                //TODO:
+                //for most remote location, we need mount remote location to gvfs by GMountOperation.
+                //we need show a dialog for passing athucation info to do a mount.
+
+                GFile *file = g_file_new_for_uri(fileInfo->path().uri().get());
+                GFileInfo *info = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, G_FILE_QUERY_INFO_NONE, nullptr, nullptr);
+                const char *target_uri = g_file_info_get_attribute_string(info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI);
+
+                Fm::FilePath target_path = Fm::FilePath::fromUri(target_uri);
+
+                g_object_unref(info);
+                g_object_unref(file);
+                if (!target_path.isValid()){
+                    qDebug()<<fileInfo->path().uri().get();
+                    qDebug()<<fileInfo->path().toString().get();
+                    Q_EMIT pushBackListRequest(this->path());
+                    Q_EMIT updatePathBarRequest(fileInfo->path());
+                } else {
+                    Fm::MountOperation mount_op;
+                    if (fileInfo->isMountable()){
+                        mount_op.mountEnclosingVolume(target_path);
+                        //show ask dialog and mount to local,
+                        //otherwise we can not access target path.
+                    }
+                    Q_EMIT pushBackListRequest(target_path);
+                    Q_EMIT updatePathBarRequest(target_path);
+                }
             }
         } else {
             Fm::FileInfoList file_list;
@@ -64,6 +96,7 @@ void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::Fi
         }
         break;
     case 1:
+        //middle clicked
         //open in new window
         break;
     case 2:

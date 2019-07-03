@@ -19,6 +19,12 @@ class PeonyPreviewPane;
 
 class QSplitter;
 
+enum LastFileOpType {
+    Copy,
+    Cut,
+    Other
+};
+
 class PeonyNavigationWindow : public QWidget
 {
     Q_OBJECT
@@ -48,12 +54,6 @@ public Q_SLOTS:
 
     void changeSortMode(int sortmode);
 
-    void copyToClipboard();
-    void pasteFromClipboard();
-    void cutToClipboard();//deal with in paste?
-
-    void deleteSelection();
-
     void shareSelection();
     void burn();//
     void archiveSelection();
@@ -65,6 +65,12 @@ public Q_SLOTS:
 
     void goToFolder(Fm::Folder *folder, bool createNewWindow);
     */
+    void copyToClipboard();
+    void pasteFromClipboard();
+    void cutToClipboard();//deal with in paste?
+
+    void deleteSelection();
+
     void goBack();
     void goForward();
     void showHistoryMenu(QAction *listHistoryAction, QMenu *historyMenu);
@@ -90,6 +96,9 @@ private:
 
     Fm::FilePathList m_forward_list;
     Fm::FilePathList m_backward_list;
+
+    Fm::FilePathList m_clipborad_list;
+    LastFileOpType last_file_op_type = Other;
 };
 
 #endif // PEONYNAVIGATIONWINDOW_H

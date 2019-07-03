@@ -35,7 +35,6 @@ void PeonyToolBar::createToolBar()
     newDirectoryAction->setShortcuts(QKeySequence::New);
     newDirectoryAction->setStatusTip("New a folder");
     //connect action trigged signal
-    newDirectoryAction->setShortcut(QKeySequence::Copy);//just a test for shortcut
     connect(newDirectoryAction, &QAction::triggered, [=](){qDebug()<<"request create folder";Q_EMIT this->createFolderRequest();});
 
     toolBar->addAction(newDirectoryAction);
@@ -83,10 +82,13 @@ void PeonyToolBar::createToolBar()
     toolBar->addSeparator();
 
     QAction *copyAction = new QAction(QIcon::fromTheme("gtk-copy"), tr("Copy"), this);
+    copyAction->setShortcut(QKeySequence::Copy);
     connect(copyAction, &QAction::triggered, [=](){Q_EMIT this->copyToClipboardRequest();});
     QAction *pasteAction = new QAction(QIcon::fromTheme("gtk-paste"), tr("Paste"), this);
+    pasteAction->setShortcut(QKeySequence::Paste);
     connect(pasteAction, &QAction::triggered, [=](){Q_EMIT this->pasteFromClipboardRequest();});
     QAction *cutAction = new QAction(QIcon::fromTheme("gtk-cut"), tr("Cut"), this);
+    cutAction->setShortcut(QKeySequence::Cut);
     connect(cutAction, &QAction::triggered, [=](){Q_EMIT this->cutToClipboradRequest();});
     QList<QAction*> fileOpActions;
     toolBar->addActions(fileOpActions<<copyAction<<pasteAction<<cutAction);
@@ -94,6 +96,7 @@ void PeonyToolBar::createToolBar()
     //delete or trash?
     toolBar->addSeparator();
     QAction *deleteAction = new QAction(QIcon::fromTheme("gtk-close"), tr("Delete"), this);
+    deleteAction->setShortcut(QKeySequence::Delete);
     connect(deleteAction, &QAction::triggered, [=](){Q_EMIT this->deleteSelectionRequest();});
     toolBar->addAction(deleteAction);
 

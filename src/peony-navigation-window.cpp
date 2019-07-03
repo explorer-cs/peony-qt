@@ -16,6 +16,8 @@
 #include <libfm-qt/filesearchdialog.h>
 #include <libfm-qt/filelauncher.h>
 
+#include <libfm-qt/fileoperation.h>
+
 #include <QSplitter>
 #include <QAction>
 #include <QMenu>
@@ -84,7 +86,8 @@ void PeonyNavigationWindow::createFolderView()
     connect(side_bar_view, &Fm::PlacesView::chdirRequested, [=](int type, const Fm::FilePath& path){
         qDebug()<<"type:"<<type;
         if (type == 0){
-            this->goToPath(path);
+            //this->goToPath(path);
+            this->updateLocationBarPath(path);
         }
     });
     side_bar_view->setMaximumWidth(200);
@@ -145,6 +148,12 @@ void PeonyNavigationWindow::initSignal()
             this->goToPath(Fm::FilePath::fromUri(c_str_uri));
             this->updateLocationBarPath(Fm::FilePath::fromUri(c_str_uri));
         });
+
+        //connect file op
+        connect(m_tool_bar, &PeonyToolBar::copyToClipboardRequest, this, &PeonyNavigationWindow::copyToClipboard);
+        connect(m_tool_bar, &PeonyToolBar::cutToClipboradRequest, this, &PeonyNavigationWindow::cutToClipboard);
+        connect(m_tool_bar, &PeonyToolBar::pasteFromClipboardRequest, this, &PeonyNavigationWindow::pasteFromClipboard);
+        connect(m_tool_bar, &PeonyToolBar::deleteSelectionRequest, this, &PeonyNavigationWindow::deleteSelection);
 
         //location bar
         Fm::FilePath path = m_folder_view->path();
@@ -263,3 +272,42 @@ void PeonyNavigationWindow::showHistoryMenu(QAction *, QMenu *historyMenu)
         historyMenu->exec(QCursor::pos());
     }
 }
+
+//file operation
+void PeonyNavigationWindow::copyToClipboard()
+{
+    last_file_op_type = Copy;
+    Fm::FilePathList list = m_folder_view->selectedFiles().paths();
+    m_clipborad_list.clear();
+    m_clipborad_list.insert(m_clipborad_list.begin(), list.begin(), list.end());
+}
+
+void PeonyNavigationWindow::pasteFromClipboard()
+{
+    switch (last_file_op_type) {
+    case Copy:
+        Fm::FileOperation::copyFiles(m_clipborad_list, m_folder_view->path(), this);
+        break;
+    case Cut:
+        Fm::FileOperation::moveFiles(m_clipborad_list, m_folder_view->path(), this);
+        break;
+    default:
+        break;
+    }
+}
+
+void PeonyNavigationWindow::cutToClipboard()
+{
+    last_file_op_type = Cut;
+    Fm::FilePathList list = m_folder_view->selectedFiles().paths();
+    m_clipborad_list.clear();
+    m_clipborad_list.insert(m_clipborad_list.begin(), list.begin(), list.end());
+    //hide or alpha selected files.
+}
+
+void PeonyNavigationWindow::deleteSelection()
+{
+    Fm::FilePathList list = m_folder_view->selectedFiles().paths();
+    Fm::FileOperation::trashFiles(list, /*true*/false, this);
+}
+//file operation
