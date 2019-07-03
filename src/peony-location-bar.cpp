@@ -68,7 +68,7 @@ void PeonyLocationBar::createLocationBar()
     */
 
     QToolBar *viewToolBar = new QToolBar(this);
-    QAction *previewAction = new QAction(QIcon::fromTheme("preview"), QAction::tr("Preview"), viewToolBar);
+    QAction *previewAction = new QAction(QIcon::fromTheme("preview"), tr("Preview"), viewToolBar);
     QAction *iconViewAction = new QAction(QIcon::fromTheme("icon-view"), tr("Icon View"), viewToolBar);
     QAction *listViewAction = new QAction(QIcon::fromTheme("list-view"), tr("List View"), viewToolBar);
     QList<QAction*> viewToolBarActions;

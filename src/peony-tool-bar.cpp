@@ -42,7 +42,7 @@ void PeonyToolBar::createToolBar()
 
     const QIcon newWindowIcon = QIcon::fromTheme("gtk-new", QIcon::fromTheme("add"));
     QAction *newWindowIconAction = new QAction(newWindowIcon, tr("New Window"), this);
-    newWindowIconAction->setToolTip("Create new peony window");
+    newWindowIconAction->setToolTip(tr("Create new peony window"));
     //connect
     toolBar->addAction(newWindowIconAction);
 
@@ -68,7 +68,7 @@ void PeonyToolBar::createToolBar()
     toolBar->addAction(selectViewAction);
 
     //what the aim of this action?
-    QAction *sortAction = new QAction(QIcon::fromTheme("gtk-sort-ascending"), "Sort Ascending", this);
+    QAction *sortAction = new QAction(QIcon::fromTheme("gtk-sort-ascending"), tr("Sort Ascending"), this);
     QMenu *sortMenu = new QMenu(this);
     QAction *sortByName = new QAction(tr("By Name"), sortMenu);
     connect(sortByName, &QAction::triggered, [=](){Q_EMIT this->changeSortModeRequest(Fm::FolderModel::ColumnFileName);});

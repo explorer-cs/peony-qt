@@ -9,11 +9,16 @@
 #include "peony-navigation-window.h"
 #include "peony-tool-bar.h"
 
+#include <QTranslator>
+
+static bool is_translator_installed = false;
 static void testPlugin();
 
 PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc, argv)
 {
     QIcon::setThemeName("ukui-icon-theme");
+
+    initTranslation();
     //testLibFm();
     //testPlugin();
 
@@ -33,6 +38,16 @@ PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc,
     w2->resize(1000,618);
     w2->show();
     */
+}
+
+void PeonyApplication::initTranslation()
+{
+    if (is_translator_installed)
+        return;
+
+    QTranslator *trans = new QTranslator(this);
+    this->installTranslator(trans);
+    is_translator_installed = trans->load("peony-qt_"+QLocale::system().name(), ":/translations");
 }
 
 void testPlugin()
