@@ -14,10 +14,16 @@ void PeonyStatusBar::createStatusBar()
         return;
 
     QHBoxLayout *hLayout = new QHBoxLayout(this);
+    hLayout->setMargin(0);
+    hLayout->setContentsMargins(0, 0, 0, 0);
+    hLayout->setAlignment(Qt::AlignTop);
 
     QLabel *statusLabel = new QLabel(tr("status bar"), this);
     m_label = statusLabel;
-    hLayout->addWidget(statusLabel, 0, Qt::AlignCenter);
+    statusLabel->setMargin(0);
+    statusLabel->setContentsMargins(0, 0, 0, 0);
+    hLayout->addWidget(statusLabel, 0, Qt::AlignHCenter);
+    setFixedHeight(28);
 
     setLayout(hLayout);
 }

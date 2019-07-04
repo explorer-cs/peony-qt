@@ -6,6 +6,7 @@
 
 #include <libfm-qt/folderview_p.h>
 #include <libfm-qt/mountoperation.h>
+#include <libfm-qt/core/dirlistjob.h>
 
 #include <QStyledItemDelegate>
 
@@ -106,4 +107,9 @@ void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::Fi
     default:
         break;
     }
+}
+
+void PeonyFolderView::reload()
+{
+    folder()->reload();
 }

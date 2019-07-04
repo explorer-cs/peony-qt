@@ -23,6 +23,7 @@ Q_SIGNALS:
     void backRequest();
     void forwardRequest();
     void historyMenuRequest(QAction *historyAction, QMenu *historyMenu);
+    void reloadViewRequest();
     void goToRequest(QString location);//a Fm::FilePath? a QString?
     void cdUpRequest();
 

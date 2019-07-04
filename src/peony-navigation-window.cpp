@@ -144,9 +144,16 @@ void PeonyNavigationWindow::initSignal()
             qDebug()<<"jump to"<<searchUri;
             std::string tmp = searchUri.toStdString();
             const char* c_str_uri = tmp.c_str();
+            Fm::FilePath search_path = Fm::FilePath::fromUri(c_str_uri);
+            Fm::FilePathList list;
+            list.push_back(search_path);
+            qDebug()<<search_path.uri().get();
+            m_folder_view->launchPaths(this, list);
             //how to jump to a correct search uri?
+            /*
             this->goToPath(Fm::FilePath::fromUri(c_str_uri));
             this->updateLocationBarPath(Fm::FilePath::fromUri(c_str_uri));
+            */
         });
 
         //connect file op
@@ -172,6 +179,7 @@ void PeonyNavigationWindow::initSignal()
         connect(m_location_bar, &PeonyLocationBar::forwardRequest, this, &PeonyNavigationWindow::goForward);
 
         connect(m_location_bar, &PeonyLocationBar::historyMenuRequest, this, &PeonyNavigationWindow::showHistoryMenu);
+        connect(m_location_bar, &PeonyLocationBar::reloadViewRequest, m_folder_view, &PeonyFolderView::reload);
         //folder view
         connect(m_folder_view, &PeonyFolderView::updatePathBarRequest, this, &PeonyNavigationWindow::updateLocationBarPath);
 

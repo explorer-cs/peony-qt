@@ -58,13 +58,38 @@ void PeonyToolBar::createToolBar()
 
     QMenu *viewSelectMenu = new QMenu(this);
     QAction *chooseIconViewAction = new QAction(QIcon::fromTheme("gtk-go-up"), tr("Icon View"), viewSelectMenu);
-    connect(chooseIconViewAction, &QAction::triggered, [=](){Q_EMIT this->changeViewModeRequest(Fm::FolderView::IconMode);});
+    chooseIconViewAction->setCheckable(true);
+    chooseIconViewAction->setChecked(true);
+
     viewSelectMenu->addAction(chooseIconViewAction);
     QAction *chooseListViewAction = new QAction(QIcon::fromTheme("gtk-go-down"), tr("List View"), viewSelectMenu);
-    connect(chooseListViewAction, &QAction::triggered, [=](){Q_EMIT this->changeViewModeRequest(Fm::FolderView::DetailedListMode);});
+    chooseListViewAction->setCheckable(true);
+
     viewSelectMenu->addAction(chooseListViewAction);
     selectViewAction->setMenu(viewSelectMenu);
     toolBar->addAction(selectViewAction);
+
+    connect(chooseIconViewAction, &QAction::triggered, [=](){
+        Q_EMIT this->changeViewModeRequest(Fm::FolderView::IconMode);
+        chooseIconViewAction->setChecked(true);
+        chooseListViewAction->setChecked(false);
+    });
+    connect(chooseListViewAction, &QAction::triggered, [=](){
+        Q_EMIT this->changeViewModeRequest(Fm::FolderView::DetailedListMode);
+        chooseIconViewAction->setChecked(false);
+        chooseListViewAction->setChecked(true);
+    });
+    connect(selectViewAction, &QAction::triggered, [=](){
+        if (chooseIconViewAction->isChecked()) {
+            chooseIconViewAction->setChecked(false);
+            chooseListViewAction->setChecked(true);
+            Q_EMIT this->changeViewModeRequest(Fm::FolderView::DetailedListMode);
+        } else {
+            chooseIconViewAction->setChecked(true);
+            chooseListViewAction->setChecked(false);
+            Q_EMIT this->changeViewModeRequest(Fm::FolderView::IconMode);
+        }
+    });
 
     //what the aim of this action?
     QAction *sortAction = new QAction(QIcon::fromTheme("gtk-sort-ascending"), tr("Sort Ascending"), this);

@@ -11,6 +11,8 @@
 
 #include <QTranslator>
 
+#include "peony-folder-view.h" //testFolder
+
 static bool is_translator_installed = false;
 static void testPlugin();
 

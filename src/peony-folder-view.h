@@ -15,6 +15,7 @@ public:
 
 public Q_SLOTS:
     void onFileClicked(int type, const std::shared_ptr<const Fm::FileInfo>& fileInfo) override;
+    void reload();
 
 Q_SIGNALS:
     void updatePathBarRequest(const Fm::FilePath path);
@@ -24,6 +25,7 @@ private:
     Fm::FolderModel *m_model = nullptr;
     Fm::ProxyFolderModel *m_proxy_model = nullptr;
     //Fm::CachedFolderModel *m_cache_model = nullptr;
+    std::shared_ptr<Fm::Folder> folder_;
 };
 
 #endif // PEONYFOLDERVIEW_H

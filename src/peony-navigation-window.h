@@ -6,6 +6,7 @@
 
 #include <libfm-qt/foldermodel.h>
 #include <libfm-qt/folderview.h>
+#include <libfm-qt/proxyfoldermodel.h>
 
 class BorderLayout;
 
@@ -99,6 +100,8 @@ private:
 
     Fm::FilePathList m_clipborad_list;
     LastFileOpType last_file_op_type = Other;
+
+    Fm::ProxyFolderModelFilter *m_filter = nullptr;
 };
 
 #endif // PEONYNAVIGATIONWINDOW_H

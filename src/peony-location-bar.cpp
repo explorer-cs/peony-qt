@@ -51,6 +51,8 @@ void PeonyLocationBar::createLocationBar()
 
     QAction *reloadAction = new QAction(QIcon::fromTheme("gtk-refresh"), tr("Refresh"), navigationToolBar);
     navigationToolBar->addAction(reloadAction);
+    reloadAction->setShortcut(QKeySequence(tr("F5", "Reload")));
+    connect(reloadAction, &QAction::triggered, this, &PeonyLocationBar::reloadViewRequest);
 
     hLayout->addWidget(navigationToolBar);
 
