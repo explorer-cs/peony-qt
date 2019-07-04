@@ -149,7 +149,7 @@ void PeonyNavigationWindow::initSignal()
             list.push_back(search_path);
             qDebug()<<search_path.uri().get();
             //vfs search:/// must be register, Fm::LibfmQt instance will do that.
-            this->goToPath(Fm::FilePath::fromUri(c_str_uri));
+            //this->goToPath(Fm::FilePath::fromUri(c_str_uri));
             this->updateLocationBarPath(Fm::FilePath::fromUri(c_str_uri));
         });
 
