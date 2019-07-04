@@ -148,12 +148,9 @@ void PeonyNavigationWindow::initSignal()
             Fm::FilePathList list;
             list.push_back(search_path);
             qDebug()<<search_path.uri().get();
-            m_folder_view->launchPaths(this, list);
-            //how to jump to a correct search uri?
-            /*
+            //vfs search:/// must be register, Fm::LibfmQt instance will do that.
             this->goToPath(Fm::FilePath::fromUri(c_str_uri));
             this->updateLocationBarPath(Fm::FilePath::fromUri(c_str_uri));
-            */
         });
 
         //connect file op
