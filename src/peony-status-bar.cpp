@@ -32,4 +32,6 @@ void PeonyStatusBar::updateStatusBarStatus(QString string)
 {
     if (m_label != nullptr)
         m_label->setText(string);
+    if (string == "/")
+        m_label->setText("");
 }

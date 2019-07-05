@@ -105,7 +105,6 @@ void PeonyNavigationWindow::createFolderView()
 void PeonyNavigationWindow::cdUp()
 {
     if (m_folder_view != nullptr){
-        m_backward_list.push_back(m_folder_view->path());
         m_forward_list.clear();
         Fm::ProxyFolderModel *model = m_folder_view->model();
         Fm::CachedFolderModel *sourceModel = static_cast<Fm::CachedFolderModel*>(model->sourceModel());
@@ -234,6 +233,8 @@ void PeonyNavigationWindow::goToPath(const Fm::FilePath &path, bool addHistory)
             return;
         if (addHistory) {
             m_backward_list.push_back(m_folder_view->path());
+            if (m_backward_list.size() > 10)
+                m_backward_list.erase(m_backward_list.begin());
         }
         Fm::ProxyFolderModel *model = m_folder_view->model();
         Fm::CachedFolderModel *sourceModel = static_cast<Fm::CachedFolderModel*>(model->sourceModel());
@@ -243,9 +244,13 @@ void PeonyNavigationWindow::goToPath(const Fm::FilePath &path, bool addHistory)
 
 void PeonyNavigationWindow::updateLocationBarPath(Fm::FilePath path)
 {
-    if (m_location_bar) {
+    if (m_location_bar && (m_folder_view->path() != path)) {
         m_location_bar->pathBar()->setPath(path);
-        m_status_bar->updateStatusBarStatus(path.baseName().get());
+        if (QString(path.baseName().get()) != "/")
+            m_status_bar->updateStatusBarStatus(path.baseName().get());
+        else {
+            m_status_bar->updateStatusBarStatus(path.displayName().get());
+        }
     }
 }
 
@@ -290,6 +295,8 @@ void PeonyNavigationWindow::showHistoryMenu(QAction *, QMenu *historyMenu)
             historyMenu->addAction(menuItem);
             connect(menuItem, &QAction::triggered, [=](){
                 this->goToPath(back_path, false);
+                m_location_bar->pathBar()->setPath(back_path);
+                m_status_bar->updateStatusBarStatus(back_path.baseName().get());
                 //backward list and forward list need change.
             });
         }
@@ -300,6 +307,8 @@ void PeonyNavigationWindow::showHistoryMenu(QAction *, QMenu *historyMenu)
             historyMenu->addAction(menuItem);
             connect(menuItem, &QAction::triggered, [=](){
                 this->goToPath(forward_path, false);
+                m_location_bar->pathBar()->setPath(forward_path);
+                m_status_bar->updateStatusBarStatus(forward_path.baseName().get());
                 //backward list and forward list need change.
             });
         }
@@ -328,6 +337,7 @@ void PeonyNavigationWindow::pasteFromClipboard()
     default:
         break;
     }
+    m_folder_view->reload();
 }
 
 void PeonyNavigationWindow::cutToClipboard()
@@ -343,5 +353,6 @@ void PeonyNavigationWindow::deleteSelection()
 {
     Fm::FilePathList list = m_folder_view->selectedFiles().paths();
     Fm::FileOperation::trashFiles(list, /*true*/false, this);
+    m_folder_view->reload();
 }
 //file operation
