@@ -17,6 +17,9 @@
 #include <libfm-qt/filelauncher.h>
 
 #include <libfm-qt/fileoperation.h>
+#include <libfm-qt/mountoperation.h>
+
+#include <QMessageBox>
 
 #include <QSplitter>
 #include <QAction>
@@ -86,7 +89,6 @@ void PeonyNavigationWindow::createFolderView()
     connect(side_bar_view, &Fm::PlacesView::chdirRequested, [=](int type, const Fm::FilePath& path){
         qDebug()<<"type:"<<type;
         if (type == 0){
-            //this->goToPath(path);
             this->updateLocationBarPath(path);
         }
     });
@@ -149,7 +151,6 @@ void PeonyNavigationWindow::initSignal()
             list.push_back(search_path);
             qDebug()<<search_path.uri().get();
             //vfs search:/// must be register, Fm::LibfmQt instance will do that.
-            //this->goToPath(Fm::FilePath::fromUri(c_str_uri));
             this->updateLocationBarPath(Fm::FilePath::fromUri(c_str_uri));
         });
 
@@ -163,13 +164,38 @@ void PeonyNavigationWindow::initSignal()
         Fm::FilePath path = m_folder_view->path();
         m_location_bar->pathBar()->setPath(path);
         connect(m_location_bar->pathBar(), &Fm::PathBar::chdir, [=](const Fm::FilePath &location){
-            qDebug()<<"chdir signal";
+            qDebug()<<"chdir signal"<<"target path:"<<location.uri().get();
+            if (location == m_folder_view->path())
+                return ;
+            bool has_computer_schema = location.hasUriScheme("computer:///");
+            auto folder = Fm::Folder::fromPath(location);
+            connect(folder.get(), &Fm::Folder::error, [=](const Fm::GErrorPtr& err, Fm::Job::ErrorSeverity severity, Fm::Job::ErrorAction& response){
+                if (has_computer_schema) {
+                    //local volume mount has been done by PeonyFolderView::onFileClicked.
+                    response = Fm::Job::ErrorAction::CONTINUE;
+                    return ;
+                }
+                if(err.domain() == G_IO_ERROR) {
+                        if(err.code() == G_IO_ERROR_NOT_MOUNTED && severity < Fm::Job::ErrorSeverity::CRITICAL) {
+                            auto& path = folder->path();
+                            Fm::MountOperation* op = new Fm::MountOperation(true);
+                            op->setAutoDestroy(true);
+                            op->mountEnclosingVolume(path);
+                            if(op->wait()) {
+                                response = Fm::Job::ErrorAction::RETRY;
+                                return;
+                            }
+                        }
+                    }
+                    if(severity >= Fm::Job::ErrorSeverity::MODERATE) {
+                        QMessageBox::critical(this, tr("Error"), err.message());
+                    }
+                    response = Fm::Job::ErrorAction::CONTINUE;
+            });
             //this may not be a good way,
             //we'll set pathbar path twice when we clicked the pathbar button.
             updateLocationBarPath(location);
-            Fm::ProxyFolderModel *model = m_folder_view->model();
-            Fm::CachedFolderModel *sourceModel = static_cast<Fm::CachedFolderModel*>(model->sourceModel());
-            sourceModel->setFolder(Fm::Folder::fromPath(location));
+            this->goToPath(location, true);
         });
 
         connect(m_location_bar, &PeonyLocationBar::backRequest, this, &PeonyNavigationWindow::goBack);
@@ -178,10 +204,8 @@ void PeonyNavigationWindow::initSignal()
         connect(m_location_bar, &PeonyLocationBar::historyMenuRequest, this, &PeonyNavigationWindow::showHistoryMenu);
         connect(m_location_bar, &PeonyLocationBar::reloadViewRequest, m_folder_view, &PeonyFolderView::reload);
         //folder view
-        connect(m_folder_view, &PeonyFolderView::updatePathBarRequest, this, &PeonyNavigationWindow::updateLocationBarPath);
-
-        connect(m_folder_view, &PeonyFolderView::pushBackListRequest, [=](Fm::FilePath location){
-            m_backward_list.push_back(location);
+        connect(m_folder_view, &PeonyFolderView::chdirRequest, [=](const Fm::FilePath path, bool addHistory){
+            this->updateLocationBarPath(path);
         });
 
         connect(m_folder_view, &PeonyFolderView::selChanged, [=](){
@@ -201,11 +225,16 @@ void PeonyNavigationWindow::initSignal()
     }
 }
 
-void PeonyNavigationWindow::goToPath(const Fm::FilePath &path)
+void PeonyNavigationWindow::goToPath(const Fm::FilePath &path, bool addHistory)
 {
     qDebug()<<"go to path............";
     qDebug()<<"current:"<<m_folder_view->path().toString().get()<<"new:"<<path.toString().get();
     if (m_layout != nullptr){
+        if (m_folder_view->path() == path)
+            return;
+        if (addHistory) {
+            m_backward_list.push_back(m_folder_view->path());
+        }
         Fm::ProxyFolderModel *model = m_folder_view->model();
         Fm::CachedFolderModel *sourceModel = static_cast<Fm::CachedFolderModel*>(model->sourceModel());
         sourceModel->setFolder(Fm::Folder::fromPath(path));
@@ -260,7 +289,7 @@ void PeonyNavigationWindow::showHistoryMenu(QAction *, QMenu *historyMenu)
             QAction *menuItem = new QAction(back_path.toString().get(), historyMenu);
             historyMenu->addAction(menuItem);
             connect(menuItem, &QAction::triggered, [=](){
-                this->goToPath(back_path);
+                this->goToPath(back_path, false);
                 //backward list and forward list need change.
             });
         }
@@ -270,7 +299,7 @@ void PeonyNavigationWindow::showHistoryMenu(QAction *, QMenu *historyMenu)
             QAction *menuItem = new QAction(forward_path.toString().get(), historyMenu);
             historyMenu->addAction(menuItem);
             connect(menuItem, &QAction::triggered, [=](){
-                this->goToPath(forward_path);
+                this->goToPath(forward_path, false);
                 //backward list and forward list need change.
             });
         }

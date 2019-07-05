@@ -12,14 +12,16 @@ class PeonyFolderView : public Fm::FolderView
     Q_OBJECT
 public:
     explicit PeonyFolderView(QWidget *parent = nullptr);
+    static void testVolume();
 
 public Q_SLOTS:
     void onFileClicked(int type, const std::shared_ptr<const Fm::FileInfo>& fileInfo) override;
     void reload();
 
 Q_SIGNALS:
-    void updatePathBarRequest(const Fm::FilePath path);
-    void pushBackListRequest(const Fm::FilePath path);
+    //void updatePathBarRequest(const Fm::FilePath path);
+    //void pushBackListRequest(const Fm::FilePath path);
+    void chdirRequest(const Fm::FilePath path, bool addHistory);
 
 private:
     Fm::FolderModel *m_model = nullptr;

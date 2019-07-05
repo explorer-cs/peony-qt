@@ -8,6 +8,9 @@
 #include <libfm-qt/mountoperation.h>
 #include <libfm-qt/core/dirlistjob.h>
 
+#include <libfm-qt/mountoperation.h>
+
+#include <QMessageBox>
 #include <QStyledItemDelegate>
 
 #include <QDebug>
@@ -65,6 +68,7 @@ void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::Fi
                 //TODO:
                 //for most remote location, we need mount remote location to gvfs by GMountOperation.
                 //we need show a dialog for passing athucation info to do a mount.
+                //For now, this is done in PeonyNavigationWindow::updateLocationBarPath().
 
                 GFile *file = g_file_new_for_uri(fileInfo->path().uri().get());
                 GFileInfo *info = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, G_FILE_QUERY_INFO_NONE, nullptr, nullptr);
@@ -77,23 +81,37 @@ void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::Fi
                 if (!target_path.isValid()){
                     qDebug()<<fileInfo->path().uri().get();
                     qDebug()<<fileInfo->path().toString().get();
-                    Q_EMIT pushBackListRequest(this->path());
-                    Q_EMIT updatePathBarRequest(fileInfo->path());
+                    Q_EMIT chdirRequest(fileInfo->path(), true);
                 } else {
-                    Fm::MountOperation mount_op;
-                    if (fileInfo->isMountable()){
-                        mount_op.mountEnclosingVolume(target_path);
-                        //show ask dialog and mount to local,
-                        //otherwise we can not access target path.
-                    }
-                    Q_EMIT pushBackListRequest(target_path);
-                    Q_EMIT updatePathBarRequest(target_path);
+                    Q_EMIT chdirRequest(target_path, true);
                 }
             }
+        } else if (fileInfo->isMountable() && clicked_count%2 == 0) {
+            qDebug()<<"mountable file, maybe a volume?"<<"target:"<<fileInfo->target().c_str();
+            if (!fileInfo->target().empty()) {
+                Q_EMIT chdirRequest(Fm::FilePath::fromLocalPath(fileInfo->target().c_str()), true);
+            } else {
+                //must mount the volume at first.
+                Fm::MountOperation *op = new Fm::MountOperation(true, this);
+                op->setAutoDestroy(true);
+                op->mountMountable(fileInfo->path());
+                connect(op, &Fm::MountOperation::finished, [=](){
+                    //after mount op finished, we can query the target uri info manually.
+                    qDebug()<<"finish"<<"info target:"<<fileInfo->target().c_str();
+                    GFile *file = g_file_new_for_uri(fileInfo->path().uri().get());
+                    GFileInfo *info = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI, G_FILE_QUERY_INFO_NONE, nullptr, nullptr);
+                    const char *target_uri = g_file_info_get_attribute_string(info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI);
+                    qDebug()<<"query again:"<<target_uri;
+                    Fm::FilePath target_path = Fm::FilePath::fromUri(target_uri);
+                    g_object_unref(info);
+                    g_object_unref(file);
+                    Q_EMIT this->chdirRequest(target_path, true);
+                });
+                op->wait();
+            }
+            //Fm::FolderView::onFileClicked(type, fileInfo);
         } else {
-            Fm::FileInfoList file_list;
-            file_list.push_back(fileInfo);
-            fileLauncher()->launchFiles(this, file_list);
+            Fm::FolderView::onFileClicked(type, fileInfo);
         }
         break;
     case 1:
@@ -112,4 +130,9 @@ void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::Fi
 void PeonyFolderView::reload()
 {
     folder()->reload();
+}
+
+void PeonyFolderView::testVolume()
+{
+
 }

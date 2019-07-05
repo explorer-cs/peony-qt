@@ -40,7 +40,7 @@ public:
     void goToUri(const char* uri);
     void goToPath(const QString &path);
     void goToPath(const char* path);
-    void goToPath(const Fm::FilePath &path);
+    void goToPath(const Fm::FilePath &path, bool addHistory);
 
     Fm::FileInfoList getSelection();
     Fm::Folder getWindowFolder();
@@ -78,6 +78,9 @@ public Q_SLOTS:
 
     void cdUp();
     void updateLocationBarString(QString);
+    //when a folder clicked a folder view, it aslo need update path bar.
+    //I real think it wasn't a good desgin... there must be a better way.
+    //this desgin is unfriendly for history
     void updateLocationBarPath(Fm::FilePath path);
 
 private:

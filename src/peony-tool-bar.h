@@ -19,6 +19,7 @@ Q_SIGNALS:
     void changeViewModeRequest(Fm::FolderView::ViewMode viewmode);
     void changeSortModeRequest(Fm::FolderModel::ColumnId sortmode);
 
+    //maybe use clipboard provided by libfm-qt is better.
     void copyToClipboardRequest();
     void pasteFromClipboardRequest();
     void cutToClipboradRequest();
