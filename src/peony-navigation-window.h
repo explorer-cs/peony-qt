@@ -16,7 +16,7 @@ class PeonyStatusBar;
 class PeonySideBar;
 
 class PeonyFolderView;
-class PeonyPreviewPane;
+class PeonyPreviewPage;
 
 class QSplitter;
 
@@ -96,7 +96,7 @@ private:
     PeonyLocationBar *m_location_bar = nullptr;
     PeonySideBar *m_side_bar = nullptr;
     PeonyStatusBar *m_status_bar = nullptr;
-    PeonyPreviewPane *m_preview_pane = nullptr;
+    PeonyPreviewPage *m_preview_page = nullptr;
 
     Fm::FilePathList m_forward_list;
     Fm::FilePathList m_backward_list;

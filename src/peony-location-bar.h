@@ -6,6 +6,8 @@
 class QLineEdit;
 class QMenu;
 
+#include <libfm-qt/folderview.h> //Fm::FolderView::ViewMode
+
 namespace Fm {
     class PathBar;
     class FilePath;
@@ -14,6 +16,7 @@ namespace Fm {
 class PeonyLocationBar : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit PeonyLocationBar(QWidget *parent = nullptr);
     void createLocationBar();
@@ -28,6 +31,9 @@ Q_SIGNALS:
     void cdUpRequest();
 
     void searchByKeyRequest(QString key);
+
+    void previewPageStateChangeRequest(bool show);
+    void switchViewModeRequest(Fm::FolderView::ViewMode);
 
 public Q_SLOTS:
     void updateLocationBarStatus(QString location);

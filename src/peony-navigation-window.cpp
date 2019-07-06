@@ -8,6 +8,8 @@
 
 #include "peony-folder-view.h"
 
+#include "peony-preview-page.h"
+
 #include <libfm-qt/placesview.h>
 #include <libfm-qt/placesmodel.h>
 #include <libfm-qt/pathbar.h>
@@ -42,6 +44,14 @@ void PeonyNavigationWindow::initLayout()
     createToolBars();
     createStatusBar();
     createFolderView();
+
+    //m_view_spliter is created by PeonyNavigationWindow::createFolderView()
+    //splitter index:
+    //0.side bar, 1.folder view, 2.preview page
+    m_preview_page = new PeonyPreviewPage(this);
+    m_view_splitter->addWidget(m_preview_page);
+    m_view_splitter->setCollapsible(2, false);
+    m_preview_page->hide();
 }
 
 void PeonyNavigationWindow::createToolBars()
@@ -94,6 +104,7 @@ void PeonyNavigationWindow::createFolderView()
     });
     side_bar_view->setMaximumWidth(200);
     m_view_splitter->insertWidget(0, side_bar_view);
+    m_view_splitter->setCollapsible(0, false);
 
     m_view_splitter->setHandleWidth(1.0);
 
@@ -202,8 +213,16 @@ void PeonyNavigationWindow::initSignal()
 
         connect(m_location_bar, &PeonyLocationBar::historyMenuRequest, this, &PeonyNavigationWindow::showHistoryMenu);
         connect(m_location_bar, &PeonyLocationBar::reloadViewRequest, m_folder_view, &PeonyFolderView::reload);
+
+        connect(m_location_bar, &PeonyLocationBar::switchViewModeRequest, [=](Fm::FolderView::ViewMode mode){
+            if (mode == m_folder_view->viewMode())
+                return ;
+            m_folder_view->setViewMode(mode);
+        });
+
         //folder view
         connect(m_folder_view, &PeonyFolderView::chdirRequest, [=](const Fm::FilePath path, bool addHistory){
+            //maybe updateLocationBarPath need add arg addHistory?
             this->updateLocationBarPath(path);
         });
 
@@ -219,6 +238,44 @@ void PeonyNavigationWindow::initSignal()
                 m_status_bar->updateStatusBarStatus(QString::number(infos.size())+" selected");
             } else {
                 m_status_bar->updateStatusBarStatus(QString(m_folder_view->path().baseName().get()));
+            }
+        });
+
+        //preview page and location bar control
+
+        //connect/disconnect m_preview_page signal dynamiclly.
+        connect(m_folder_view, &PeonyFolderView::selChanged, m_preview_page, &PeonyPreviewPage::selChanged);
+
+        connect(m_location_bar, &PeonyLocationBar::previewPageStateChangeRequest, [=](bool show){
+            if (show) {
+                connect(m_preview_page, &PeonyPreviewPage::selChanged, [=](){
+                    if (!m_preview_page->isVisible())
+                        return ;
+                    qDebug()<<"preview";
+                    Fm::FilePathList selections = m_folder_view->selectedFiles().paths();
+                    if (selections.empty()) {
+                        m_preview_page->setDefault();
+                    } else {
+                        auto path = selections.begin();
+                        qDebug()<<path->uri().get();
+                        m_preview_page->preview(path->localPath().get());
+                    }
+                });
+
+                //when open a preview page, it might be better to start a preview
+                //if files selected.
+                Fm::FilePathList selections = m_folder_view->selectedFiles().paths();
+                if (selections.empty()) {
+                    m_preview_page->setDefault();
+                } else {
+                    auto path = selections.begin();
+                    qDebug()<<path->uri().get();
+                    m_preview_page->preview(path->localPath().get());
+                }
+                m_preview_page->show();
+            } else {
+                m_preview_page->disconnect(nullptr, nullptr, nullptr, nullptr);
+                m_preview_page->hide();
             }
         });
     }

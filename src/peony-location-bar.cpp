@@ -71,8 +71,22 @@ void PeonyLocationBar::createLocationBar()
 
     QToolBar *viewToolBar = new QToolBar(this);
     QAction *previewAction = new QAction(QIcon::fromTheme("preview"), tr("Preview"), viewToolBar);
+    previewAction->setCheckable(true);
+    connect(previewAction, &QAction::triggered, [=](bool triggered){
+        qDebug()<<triggered;
+        previewAction->setChecked(triggered);
+        Q_EMIT this->previewPageStateChangeRequest(triggered);
+    });
+
     QAction *iconViewAction = new QAction(QIcon::fromTheme("icon-view"), tr("Icon View"), viewToolBar);
     QAction *listViewAction = new QAction(QIcon::fromTheme("list-view"), tr("List View"), viewToolBar);
+    connect(iconViewAction, &QAction::triggered, [=](){
+        Q_EMIT this->switchViewModeRequest(Fm::FolderView::IconMode);
+    });
+    connect(listViewAction, &QAction::triggered, [=](){
+        Q_EMIT this->switchViewModeRequest(Fm::FolderView::DetailedListMode);
+    });
+
     QList<QAction*> viewToolBarActions;
     viewToolBar->addActions(viewToolBarActions<<previewAction<<iconViewAction<<listViewAction);
     hLayout->addWidget(viewToolBar, 0, Qt::AlignRight);

@@ -35,7 +35,8 @@ SOURCES += \
     border-layout.cpp \
     peony-folder-view.cpp \
     peony-status-bar.cpp \
-    peony-location-bar.cpp
+    peony-location-bar.cpp \
+    peony-preview-page.cpp
 
 HEADERS += \
     peony-application.h \
@@ -44,7 +45,8 @@ HEADERS += \
     border-layout.h \
     peony-folder-view.h \
     peony-status-bar.h \
-    peony-location-bar.h
+    peony-location-bar.h \
+    peony-preview-page.h
 
 INCLUDEPATH    += ../plugin-iface
 
