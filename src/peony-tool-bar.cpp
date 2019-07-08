@@ -42,7 +42,7 @@ void PeonyToolBar::createToolBar()
     const QIcon newWindowIcon = QIcon::fromTheme("gtk-new", QIcon::fromTheme("add"));
     QAction *newWindowIconAction = new QAction(newWindowIcon, tr("New Window"), this);
     newWindowIconAction->setToolTip(tr("Create new peony window"));
-    //connect
+    connect(newWindowIconAction, &QAction::triggered, this, &PeonyToolBar::newWindowRequest);
     toolBar->addAction(newWindowIconAction);
 
     QAction *openInTerminalAction = new QAction(QIcon::fromTheme("terminal"), tr("Opem in terminal"), this);

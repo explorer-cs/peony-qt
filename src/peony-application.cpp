@@ -21,25 +21,18 @@ PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc,
     QIcon::setThemeName("ukui-icon-theme");
 
     initTranslation();
-    //testLibFm();
     //testPlugin();
 
     //in libfmqt desgin, cache model is a static model shared by all window now, it is a serious problem.
     //it is shared by every path bar, every folder view, that means our signal will change all window location in our desgin.
     //use Fm::FolderModel directly, rather than cache model.
-    PeonyNavigationWindow *w1 = new PeonyNavigationWindow;
-    w1->initLayout();
-    w1->initSignal();
+    PeonyNavigationWindow *w1 = new PeonyNavigationWindow(nullptr);
     w1->resize(1000,618);
     w1->show();
 
-    /*
-    PeonyNavigationWindow *w2 = new PeonyNavigationWindow;
-    w2->initLayout();
-    w2->initSignal();
-    w2->resize(1000,618);
-    w2->show();
-    */
+    //PeonyNavigationWindow *w2 = new PeonyNavigationWindow(Fm::FilePath::fromUri("computer:///"), nullptr);
+    //w2->show();
+
 }
 
 void PeonyApplication::initTranslation()

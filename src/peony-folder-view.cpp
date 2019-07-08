@@ -19,9 +19,8 @@ static int clicked_count = 0;
 
 PeonyFolderView::PeonyFolderView(QWidget *parent) : Fm::FolderView(parent)
 {
-    Fm::FilePath home = Fm::FilePath::homeDir();
     m_model = new Fm::FolderModel;
-    m_model->setFolder(Fm::Folder::fromPath(Fm::FilePath::homeDir()));
+    m_model->setFolder(nullptr);
 
     Fm::ProxyFolderModel *proxy_model = new Fm::ProxyFolderModel();
     proxy_model->sort(Fm::FolderModel::ColumnFileName, Qt::AscendingOrder);

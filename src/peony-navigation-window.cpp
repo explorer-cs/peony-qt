@@ -21,17 +21,37 @@
 #include <libfm-qt/fileoperation.h>
 #include <libfm-qt/mountoperation.h>
 
+#include <libfm-qt/utilities.h>
+
 #include <QMessageBox>
 
 #include <QSplitter>
 #include <QAction>
 #include <QMenu>
 
+#include <QProcess>
+
 PeonyNavigationWindow::PeonyNavigationWindow(QWidget *parent) : QWidget (parent)
 {
     //QIcon::setThemeName("ukui-icon-theme");
     m_forward_list.clear();
     m_backward_list.clear();
+
+    initLayout();
+    initSignal();
+    goToPath(Fm::FilePath::homeDir(), false);
+    m_location_bar->pathBar()->setPath(Fm::FilePath::homeDir());
+}
+
+PeonyNavigationWindow::PeonyNavigationWindow(Fm::FilePath target_dir ,QWidget *parent) : QWidget (parent)
+{
+    m_forward_list.clear();
+    m_backward_list.clear();
+
+    initLayout();
+    initSignal();
+    goToPath(target_dir, false);
+    m_location_bar->pathBar()->setPath(target_dir);
 }
 
 void PeonyNavigationWindow::initLayout()
@@ -117,10 +137,9 @@ void PeonyNavigationWindow::cdUp()
 {
     if (m_folder_view != nullptr){
         m_forward_list.clear();
-        Fm::ProxyFolderModel *model = m_folder_view->model();
-        Fm::CachedFolderModel *sourceModel = static_cast<Fm::CachedFolderModel*>(model->sourceModel());
-        Fm::FilePath parent_path = sourceModel->folder()->path().parent();
+        Fm::FilePath parent_path = m_folder_view->path().parent();
         if (parent_path.isValid()){
+            goToPath(parent_path, true);
             updateLocationBarPath(parent_path);
         }
     }
@@ -136,7 +155,40 @@ void PeonyNavigationWindow::initSignal()
 {
     if (m_layout != nullptr){
         //tool bar
-        connect(m_location_bar, &PeonyLocationBar::cdUpRequest, this, &PeonyNavigationWindow::cdUp);
+        connect(m_tool_bar, &PeonyToolBar::createFolderRequest, [=](){
+            Fm::createFileOrFolder(Fm::CreateNewFolder, m_folder_view->path(), nullptr, nullptr);
+        });
+        connect(m_tool_bar, &PeonyToolBar::newWindowRequest, [=](){
+            PeonyNavigationWindow *new_window = new PeonyNavigationWindow(m_folder_view->path(), nullptr);
+            new_window->resize(1000, 618);
+            new_window->show();
+        });
+        connect(m_tool_bar, &PeonyToolBar::openInTerminalRequest, [=](){
+            qDebug()<<"open terminal";
+            qDebug()<<m_folder_view->path().toString().get();
+            std::string path = m_folder_view->path().toString().get();
+            const gchar* directory = path.c_str();
+            gchar **argv = nullptr;
+            qDebug()<<g_shell_parse_argv ("mate-terminal", nullptr, &argv, nullptr);
+            qDebug()<<argv;
+            GError *err = nullptr;
+            g_spawn_sync (directory,
+                       argv,
+                       nullptr,
+                       G_SPAWN_SEARCH_PATH,
+                       nullptr,
+                       nullptr,
+                       nullptr,
+                       nullptr,
+                       nullptr,
+                       &err);
+            if (err) {
+                qDebug()<<err->message;
+                g_error_free(err);
+                err = nullptr;
+            }
+            g_strfreev (argv);
+        });
 
         connect(m_tool_bar, &PeonyToolBar::changeViewModeRequest, m_folder_view, &PeonyFolderView::setViewMode);
         connect(m_tool_bar, &PeonyToolBar::changeSortModeRequest, [=](Fm::FolderModel::ColumnId sortmode){
@@ -170,9 +222,28 @@ void PeonyNavigationWindow::initSignal()
         connect(m_tool_bar, &PeonyToolBar::pasteFromClipboardRequest, this, &PeonyNavigationWindow::pasteFromClipboard);
         connect(m_tool_bar, &PeonyToolBar::deleteSelectionRequest, this, &PeonyNavigationWindow::deleteSelection);
 
+        //share
+
+        //burner
+        connect(m_tool_bar, &PeonyToolBar::burnRequest, [=](){
+            QProcess p;
+            p.startDetached("burner");
+        });
+        //archives
+        connect(m_tool_bar, &PeonyToolBar::archiveSeletionRequest, [=](){
+            Fm::FilePathList files = m_folder_view->selectedFiles().paths();
+            QStringList strs;
+            QString tmp_str = " ";
+            for (Fm::FilePath file : files) {
+                tmp_str = tmp_str + " " + file.toString().get();
+            }
+            qDebug()<<tmp_str;
+            QProcess p;
+            p.startDetached("parchives -d" + tmp_str);
+        });
+
         //location bar
-        Fm::FilePath path = m_folder_view->path();
-        m_location_bar->pathBar()->setPath(path);
+        connect(m_location_bar, &PeonyLocationBar::cdUpRequest, this, &PeonyNavigationWindow::cdUp);
         connect(m_location_bar->pathBar(), &Fm::PathBar::chdir, [=](const Fm::FilePath &location){
             qDebug()<<"chdir signal"<<"target path:"<<location.uri().get();
             if (location == m_folder_view->path())
@@ -204,8 +275,8 @@ void PeonyNavigationWindow::initSignal()
             });
             //this may not be a good way,
             //we'll set pathbar path twice when we clicked the pathbar button.
-            updateLocationBarPath(location);
             this->goToPath(location, true);
+            updateLocationBarPath(location);
         });
 
         connect(m_location_bar, &PeonyLocationBar::backRequest, this, &PeonyNavigationWindow::goBack);
@@ -294,8 +365,10 @@ void PeonyNavigationWindow::goToPath(const Fm::FilePath &path, bool addHistory)
                 m_backward_list.erase(m_backward_list.begin());
         }
         Fm::ProxyFolderModel *model = m_folder_view->model();
-        Fm::CachedFolderModel *sourceModel = static_cast<Fm::CachedFolderModel*>(model->sourceModel());
+        Fm::FolderModel *sourceModel = static_cast<Fm::FolderModel*>(model->sourceModel());
+        sourceModel->setFolder(nullptr);
         sourceModel->setFolder(Fm::Folder::fromPath(path));
+        model->setSourceModel(sourceModel);
     }
 }
 
@@ -376,40 +449,25 @@ void PeonyNavigationWindow::showHistoryMenu(QAction *, QMenu *historyMenu)
 //file operation
 void PeonyNavigationWindow::copyToClipboard()
 {
-    last_file_op_type = Copy;
     Fm::FilePathList list = m_folder_view->selectedFiles().paths();
-    m_clipborad_list.clear();
-    m_clipborad_list.insert(m_clipborad_list.begin(), list.begin(), list.end());
+    Fm::copyFilesToClipboard(list);
 }
 
 void PeonyNavigationWindow::pasteFromClipboard()
 {
-    switch (last_file_op_type) {
-    case Copy:
-        Fm::FileOperation::copyFiles(m_clipborad_list, m_folder_view->path(), this);
-        break;
-    case Cut:
-        Fm::FileOperation::moveFiles(m_clipborad_list, m_folder_view->path(), this);
-        break;
-    default:
-        break;
-    }
-    m_folder_view->reload();
+    Fm::pasteFilesFromClipboard(m_folder_view->path());
 }
 
 void PeonyNavigationWindow::cutToClipboard()
 {
-    last_file_op_type = Cut;
     Fm::FilePathList list = m_folder_view->selectedFiles().paths();
-    m_clipborad_list.clear();
-    m_clipborad_list.insert(m_clipborad_list.begin(), list.begin(), list.end());
-    //hide or alpha selected files.
+    Fm::cutFilesToClipboard(list);
 }
 
 void PeonyNavigationWindow::deleteSelection()
 {
     Fm::FilePathList list = m_folder_view->selectedFiles().paths();
     Fm::FileOperation::trashFiles(list, /*true*/false, this);
-    m_folder_view->reload();
+    //m_folder_view->reload();
 }
 //file operation

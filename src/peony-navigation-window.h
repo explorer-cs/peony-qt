@@ -31,6 +31,7 @@ class PeonyNavigationWindow : public QWidget
     Q_OBJECT
 public:
     explicit PeonyNavigationWindow(QWidget *parent = nullptr);
+    explicit PeonyNavigationWindow(Fm::FilePath target_dir = Fm::FilePath::homeDir() ,QWidget *parent = nullptr);
 
     void initLayout();
     void initSignal();

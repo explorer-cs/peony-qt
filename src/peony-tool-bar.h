@@ -14,6 +14,7 @@ public:
 
 Q_SIGNALS:
     void createFolderRequest();
+    void newWindowRequest();
     void openInTerminalRequest();
 
     void changeViewModeRequest(Fm::FolderView::ViewMode viewmode);
