@@ -10,12 +10,13 @@
  *  * Make application(s) easy to manage
  *  * Reduce IPC
  * </pre>
- *
+ * @note In peony qt, single application is impliment from SingleApplication, which is based on a third part library.
  */
 
-#include <QApplication>
+//#include <QApplication>
+#include "singleapplication.h"
 
-class PeonyApplication : public QApplication
+class PeonyApplication : public SingleApplication
 {
     Q_OBJECT
 public:

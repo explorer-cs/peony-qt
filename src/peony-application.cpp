@@ -16,7 +16,7 @@
 static bool is_translator_installed = false;
 static void testPlugin();
 
-PeonyApplication::PeonyApplication(int argc, char *argv[]) : QApplication (argc, argv)
+PeonyApplication::PeonyApplication(int argc, char *argv[]) : SingleApplication (argc, argv)
 {
     QIcon::setThemeName("ukui-icon-theme");
 

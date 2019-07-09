@@ -27,7 +27,8 @@
 #include <QtNetwork/QLocalSocket>
 
 #ifndef QAPPLICATION_CLASS
-  #define QAPPLICATION_CLASS QCoreApplication
+  //#define QAPPLICATION_CLASS QCoreApplication
+    #define QAPPLICATION_CLASS QApplication
 #endif
 
 #include QT_STRINGIFY(QAPPLICATION_CLASS)
@@ -37,6 +38,7 @@ class SingleApplicationPrivate;
 /**
  * @brief The SingleApplication class handles multipe instances of the same
  * Application
+ * @note For using single application instance in GUI. It must derived QApplication.
  * @see QCoreApplication
  */
 class SingleApplication : public QAPPLICATION_CLASS
