@@ -172,12 +172,10 @@ void PeonyNavigationWindow::initSignal()
             qDebug()<<g_shell_parse_argv ("mate-terminal", nullptr, &argv, nullptr);
             qDebug()<<argv;
             GError *err = nullptr;
-            g_spawn_sync (directory,
+            g_spawn_async (directory,
                        argv,
                        nullptr,
                        G_SPAWN_SEARCH_PATH,
-                       nullptr,
-                       nullptr,
                        nullptr,
                        nullptr,
                        nullptr,

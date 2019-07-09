@@ -7,12 +7,14 @@
 int main(int argc, char *argv[]) {
 
     PeonyApplication app(argc, argv);
+    if (app.isPrimary()) {
+        Fm::LibFmQt context;
 
-    Fm::LibFmQt context;
+        QTranslator translator;
+        app.installTranslator(context.translator());
+        //app.installTranslator(&translator);
+        //translator.load("libfm-qt_"+QLocale::system().name(), "/usr/share/libfm-qt/translations");
 
-    QTranslator translator;
-    app.installTranslator(&translator);
-    translator.load("libfm-qt_"+QLocale::system().name(), "/usr/share/libfm-qt/translations");
-
-    return app.exec();
+        return app.exec();
+    }
 }

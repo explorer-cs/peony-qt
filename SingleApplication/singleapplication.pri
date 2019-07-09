@@ -1,5 +1,5 @@
 QT += core network
-CONFIG += c++11
+CONFIG += c++11 debug
 
 HEADERS += $$PWD/singleapplication.h \
     $$PWD/singleapplication_p.h

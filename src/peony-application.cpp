@@ -18,6 +18,30 @@ static void testPlugin();
 
 PeonyApplication::PeonyApplication(int argc, char *argv[]) : SingleApplication (argc, argv)
 {
+    if (!this->isPrimary()) {
+        //argc = 2;
+        //argv[1] = "test";
+        qDebug()<<"secondary";
+        sendMessage(this->arguments().join(' ').toUtf8());
+        qDebug()<<"exit";
+        return;
+    } else {
+        //PCManFM-Qt using a session dbus service to support command line interaction (not freedesktop one).
+        //I'm considering wether I should expose such dbus service for all applications.
+        //It is not quite safe enough.
+        connect(this, &SingleApplication::receivedMessage, [=](quint32 instanceId, QByteArray msg){
+            qDebug()<<"id:"<<instanceId;
+            qDebug()<<"msg:"<<msg;
+
+            //client msg from secondary application should be handled by primary application
+        });
+    }
+
+    //when first instance init, we need decide wether peony-qt should manage desktop.
+    //if we are running in ukui, it should. or it is depends on argument "--force-desktop" or
+    //"--no-desktop". maybe there are more arguments, such as file paths, search request, archive options.
+    //there are all need to deal.
+
     QIcon::setThemeName("ukui-icon-theme");
 
     initTranslation();
