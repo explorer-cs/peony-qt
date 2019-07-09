@@ -20,7 +20,7 @@ class PeonyApplication : public SingleApplication
 {
     Q_OBJECT
 public:
-    PeonyApplication(int argc, char *argv[]);
+    PeonyApplication(int &argc, char *argv[]);
     //QTranslation should install before window created.
     void initTranslation();
 };

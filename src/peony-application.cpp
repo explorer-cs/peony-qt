@@ -16,7 +16,7 @@
 static bool is_translator_installed = false;
 static void testPlugin();
 
-PeonyApplication::PeonyApplication(int argc, char *argv[]) : SingleApplication (argc, argv)
+PeonyApplication::PeonyApplication(int &argc, char *argv[]) : SingleApplication (argc, argv)
 {
     if (!this->isPrimary()) {
         //argc = 2;
