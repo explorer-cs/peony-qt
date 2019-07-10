@@ -8,6 +8,7 @@
 
 #include "peony-navigation-window.h"
 #include "peony-tool-bar.h"
+#include "dbusinterface.h"
 
 #include <QTranslator>
 #include <QMessageBox>
@@ -63,7 +64,8 @@ PeonyApplication::PeonyApplication(int &argc, char *argv[]) : SingleApplication 
 
 PeonyApplication::~PeonyApplication()
 {
-
+    if (m_dbus_iface != nullptr)
+        delete m_dbus_iface;
 }
 
 void PeonyApplication::initTranslation()
@@ -97,6 +99,10 @@ void PeonyApplication::parseCmd(QStringList cmd)
             qApp->quit();
         else if (parser.isSet(deamonOption)) {
             this->setQuitOnLastWindowClosed(false);
+            if (m_dbus_iface == nullptr) {
+                qDebug()<<"tring to register dbus service";
+                m_dbus_iface = new DBusInterface;
+            }
         } else {
             if (!parser.positionalArguments().isEmpty()) {
                 qDebug()<<parser.positionalArguments();

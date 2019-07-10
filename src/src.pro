@@ -13,6 +13,7 @@ TARGET = peony-qt
 TEMPLATE = app
 
 include(../SingleApplication/singleapplication.pri)
+include(org-freedesktop-filemanager1/dbus-service.pri)
 
 PKGCONFIG +=gio-2.0 glib-2.0 gio-unix-2.0 libfm-qt
 LIBS +=-lgio-2.0 -lglib-2.0 -lX11

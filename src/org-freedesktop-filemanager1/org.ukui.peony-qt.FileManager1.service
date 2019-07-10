@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.freedesktop.FileManager1
+Exec=/usr/bin/peony-qt -d
+# I need use a flexiable Exec path which generate by program install prefix.

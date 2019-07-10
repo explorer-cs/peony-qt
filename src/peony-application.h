@@ -18,6 +18,8 @@
 
 #include <QCommandLineParser>
 
+class DBusInterface;
+
 class PeonyApplication : public SingleApplication
 {
     Q_OBJECT
@@ -27,6 +29,9 @@ public:
     //QTranslation should install before window created.
     void initTranslation();
     void parseCmd(QStringList cmd);
+
+private:
+    DBusInterface *m_dbus_iface = nullptr;
 };
 
 #endif // PEONYAPPLICATION_H
