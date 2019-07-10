@@ -10,6 +10,7 @@
 #include "peony-tool-bar.h"
 
 #include <QTranslator>
+#include <QMessageBox>
 
 #include "peony-folder-view.h" //testFolder
 
@@ -18,24 +19,7 @@ static void testPlugin();
 
 PeonyApplication::PeonyApplication(int &argc, char *argv[]) : SingleApplication (argc, argv)
 {
-    if (!this->isPrimary()) {
-        //argc = 2;
-        //argv[1] = "test";
-        qDebug()<<"secondary";
-        sendMessage(this->arguments().join(' ').toUtf8());
-        qDebug()<<"exit";
-        return;
-    } else {
-        //PCManFM-Qt using a session dbus service to support command line interaction (not freedesktop one).
-        //I'm considering wether I should expose such dbus service for all applications.
-        //It is not quite safe enough.
-        connect(this, &SingleApplication::receivedMessage, [=](quint32 instanceId, QByteArray msg){
-            qDebug()<<"id:"<<instanceId;
-            qDebug()<<"msg:"<<msg;
-
-            //client msg from secondary application should be handled by primary application
-        });
-    }
+    setApplicationVersion("0.0.1");
 
     //when first instance init, we need decide wether peony-qt should manage desktop.
     //if we are running in ukui, it should. or it is depends on argument "--force-desktop" or
@@ -45,17 +29,40 @@ PeonyApplication::PeonyApplication(int &argc, char *argv[]) : SingleApplication 
     QIcon::setThemeName("ukui-icon-theme");
 
     initTranslation();
+
+    if (!this->isPrimary()) {
+        //argc = 2;
+        //argv[1] = "test";
+        qDebug()<<"secondary";
+        this->parseCmd(arguments());
+        sendMessage(this->arguments().join(' ').toUtf8());
+        qDebug()<<"exit";
+        return;
+    } else {
+
+        //setQuitOnLastWindowClosed(false);
+
+
+        //PCManFM-Qt using a session dbus service to support command line interaction (not freedesktop one).
+        //I'm considering wether I should expose such dbus service for all applications.
+        //It is not quite safe enough.
+        this->parseCmd(arguments());
+        connect(this, &SingleApplication::receivedMessage, [=](quint32 instanceId, QByteArray msg){
+            qDebug()<<"id:"<<instanceId;
+            qDebug()<<"msg:"<<msg;
+
+            QString cmdStr = msg;
+            QStringList cmd = cmdStr.split(' ');
+            this->parseCmd(cmd);
+            //client msg from secondary application should be handled by primary application
+        });
+    }
+
     //testPlugin();
+}
 
-    //in libfmqt desgin, cache model is a static model shared by all window now, it is a serious problem.
-    //it is shared by every path bar, every folder view, that means our signal will change all window location in our desgin.
-    //use Fm::FolderModel directly, rather than cache model.
-    PeonyNavigationWindow *w1 = new PeonyNavigationWindow(nullptr);
-    w1->resize(1000,618);
-    w1->show();
-
-    //PeonyNavigationWindow *w2 = new PeonyNavigationWindow(Fm::FilePath::fromUri("computer:///"), nullptr);
-    //w2->show();
+PeonyApplication::~PeonyApplication()
+{
 
 }
 
@@ -67,6 +74,76 @@ void PeonyApplication::initTranslation()
     QTranslator *trans = new QTranslator(this);
     this->installTranslator(trans);
     is_translator_installed = trans->load("peony-qt_"+QLocale::system().name(), ":/translations");
+}
+
+void PeonyApplication::parseCmd(QStringList cmd)
+{
+    qDebug()<<"start prase cmd";
+    QCommandLineParser parser;
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption quitOption(QStringList()<<"q"<<"quit", tr("Close all peony-qt windows and quit"));
+    parser.addOption(quitOption);
+
+    QCommandLineOption deamonOption(QStringList()<<"d"<<"deamon", tr("Run application as a 'Deamon', this option only effect primary application"));
+    parser.addOption(deamonOption);
+
+    parser.addPositionalArgument("files", tr("Files or directories to open"), tr("[FILE1, FILE2,...]"));
+
+    if (this->isPrimary()) {
+        parser.process(cmd);
+        if (parser.isSet(quitOption))
+            qApp->quit();
+        else if (parser.isSet(deamonOption)) {
+            this->setQuitOnLastWindowClosed(false);
+        } else {
+            if (!parser.positionalArguments().isEmpty()) {
+                qDebug()<<parser.positionalArguments();
+                for (QString path : parser.positionalArguments()) {
+                    Fm::FilePath target_path = Fm::FilePath::fromPathStr(path.toUtf8());
+                    if (target_path.isValid()) {
+                        if (!Fm::Folder::fromPath(target_path)->isValid()) {
+                            QMessageBox *msgBox = new QMessageBox;//(tr("Error"), tr("Can not find directory"));
+                            msgBox->setWindowTitle(tr("ERROR"));
+                            msgBox->setWindowIcon(QIcon::fromTheme("gtk-error"));
+                            msgBox->setText(tr("Can not find directory: ") + path);
+                            msgBox->show();
+                            continue;
+                        }
+                        PeonyNavigationWindow *w = new PeonyNavigationWindow(target_path, nullptr);
+                        w->resize(1000, 618);
+                        w->show();
+                    } else {
+                        target_path.fromUri(path.toUtf8());
+                        if (!Fm::Folder::fromPath(target_path)->isValid()) {
+                            QMessageBox *msgBox = new QMessageBox;//(tr("Error"), tr("Can not find directory"));
+                            msgBox->setWindowTitle(tr("ERROR"));
+                            msgBox->setWindowIcon(QIcon::fromTheme("gtk-error"));
+                            msgBox->setText(tr("Can not find directory: ") + path);
+                            msgBox->show();
+                            continue;
+                        }
+                        if (target_path.isValid()) {
+                            PeonyNavigationWindow *w = new PeonyNavigationWindow(target_path, nullptr);
+                            w->resize(1000, 618);
+                            w->show();
+                        }
+                    }
+                }
+            } else {
+                //go home
+                //in libfmqt desgin, cache model is a static model shared by all window now, it is a serious problem.
+                //it is shared by every path bar, every folder view, that means our signal will change all window location in our desgin.
+                //use Fm::FolderModel directly, rather than cache model.
+                PeonyNavigationWindow *w1 = new PeonyNavigationWindow(nullptr);
+                w1->resize(1000,618);
+                w1->show();
+            }
+        }
+    } else {
+        parser.process(cmd);
+    }
 }
 
 void testPlugin()

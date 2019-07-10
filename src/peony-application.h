@@ -16,13 +16,17 @@
 //#include <QApplication>
 #include "singleapplication.h"
 
+#include <QCommandLineParser>
+
 class PeonyApplication : public SingleApplication
 {
     Q_OBJECT
 public:
     PeonyApplication(int &argc, char *argv[]);
+    ~PeonyApplication();
     //QTranslation should install before window created.
     void initTranslation();
+    void parseCmd(QStringList cmd);
 };
 
 #endif // PEONYAPPLICATION_H
