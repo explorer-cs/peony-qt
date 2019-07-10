@@ -15,18 +15,18 @@ DBusInterface::DBusInterface() :
 
 void DBusInterface::ShowFolders(const QStringList& uriList, const QString& startUpId)
 {
-    Q_UNUSED(startUpId);
     qDebug()<<"show folders:"<<uriList;
+    Q_EMIT showFolderRequest(uriList, startUpId);
 }
 
 void DBusInterface::ShowItems(const QStringList& uriList, const QString& startUpId)
 {
-    Q_UNUSED(startUpId);
     qDebug()<<"show items:"<<uriList;
+    Q_EMIT showItemsRequest(uriList, startUpId);
 }
 
 void DBusInterface::ShowItemProperties(const QStringList& uriList, const QString& startUpId)
 {
-    Q_UNUSED(startUpId);
     qDebug()<<"show item properties:"<<uriList;
+    Q_EMIT showItemPropertiesRequest(uriList, startUpId);
 }

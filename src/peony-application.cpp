@@ -10,6 +10,8 @@
 #include "peony-tool-bar.h"
 #include "dbusinterface.h"
 
+#include <libfm-qt/filepropsdialog.h>
+
 #include <QTranslator>
 #include <QMessageBox>
 
@@ -102,6 +104,49 @@ void PeonyApplication::parseCmd(QStringList cmd)
             if (m_dbus_iface == nullptr) {
                 qDebug()<<"tring to register dbus service";
                 m_dbus_iface = new DBusInterface;
+                //real show folders
+                connect(m_dbus_iface, &DBusInterface::showFolderRequest, [=](const QStringList &urlList){
+                    for (QString uri : urlList) {
+                        PeonyNavigationWindow *w = new PeonyNavigationWindow(Fm::FilePath::fromUri(uri.toUtf8()));
+                        w->resize(1000, 618);
+                        w->show();
+                    }
+                });
+                //real show items
+                //this is used mostly for web browser.
+                //TODO: select files when show items
+                connect(m_dbus_iface, &DBusInterface::showItemsRequest, [=](const QStringList urlList){
+                    //Fm::FileInfoList infos;
+                    for (QString uri : urlList) {
+                        Fm::FilePath path = Fm::FilePath::fromUri(uri.toUtf8());
+                        /*
+                        Fm::GFileInfoPtr info_ptr{g_file_query_info(path.gfile().get(), "standard::*", G_FILE_QUERY_INFO_NONE, nullptr, nullptr), true};
+                        Fm::FileInfo info;
+                        info.setFromGFileInfo(info_ptr, path, path.parent());
+                        std::shared_ptr<Fm::FileInfo> inf = std::shared_ptr<Fm::FileInfo>(&info);
+                        infos.push_back(inf);
+                        */
+                        PeonyNavigationWindow *w = new PeonyNavigationWindow(path.parent());
+                        //w->setSelectedFile(path);
+                        w->resize(1000, 618);
+                        w->show();
+                    }
+                });
+                //real show item properties
+                connect(m_dbus_iface, &DBusInterface::showItemPropertiesRequest, [=](const QStringList &urlList){
+                    /*
+                    Fm::FileInfoList infos;
+                    for (QString uri : urlList) {
+                        Fm::FilePath path = Fm::FilePath::fromUri(uri.toUtf8());
+                        Fm::GFileInfoPtr info_ptr{g_file_query_info(path.gfile().get(), "standard::*", G_FILE_QUERY_INFO_NONE, nullptr, nullptr), true};
+                        Fm::FileInfo info;
+                        info.setFromGFileInfo(info_ptr, path, path.parent());
+                        std::shared_ptr<Fm::FileInfo> inf = std::shared_ptr<Fm::FileInfo>(&info);
+                        infos.push_back(inf);
+                    }
+                    Fm::FilePropsDialog::showForFiles(infos);
+                    */
+                });
             }
         } else {
             if (!parser.positionalArguments().isEmpty()) {

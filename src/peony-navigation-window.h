@@ -43,6 +43,8 @@ public:
     void goToPath(const char* path);
     void goToPath(const Fm::FilePath &path, bool addHistory);
 
+    void setSelectedFile(const Fm::FilePath &path);
+
     Fm::FileInfoList getSelection();
     Fm::Folder getWindowFolder();
 
