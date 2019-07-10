@@ -101,35 +101,29 @@ void PeonyApplication::parseCmd(QStringList cmd)
             if (!parser.positionalArguments().isEmpty()) {
                 qDebug()<<parser.positionalArguments();
                 for (QString path : parser.positionalArguments()) {
+                    bool isDir = false;
                     Fm::FilePath target_path = Fm::FilePath::fromPathStr(path.toUtf8());
                     if (target_path.isValid()) {
-                        if (!Fm::Folder::fromPath(target_path)->isValid()) {
-                            QMessageBox *msgBox = new QMessageBox;//(tr("Error"), tr("Can not find directory"));
-                            msgBox->setWindowTitle(tr("ERROR"));
-                            msgBox->setWindowIcon(QIcon::fromTheme("gtk-error"));
-                            msgBox->setText(tr("Can not find directory: ") + path);
-                            msgBox->show();
-                            continue;
-                        }
-                        PeonyNavigationWindow *w = new PeonyNavigationWindow(target_path, nullptr);
-                        w->resize(1000, 618);
-                        w->show();
+                        isDir = true;
                     } else {
-                        target_path.fromUri(path.toUtf8());
-                        if (!Fm::Folder::fromPath(target_path)->isValid()) {
-                            QMessageBox *msgBox = new QMessageBox;//(tr("Error"), tr("Can not find directory"));
-                            msgBox->setWindowTitle(tr("ERROR"));
-                            msgBox->setWindowIcon(QIcon::fromTheme("gtk-error"));
-                            msgBox->setText(tr("Can not find directory: ") + path);
-                            msgBox->show();
-                            continue;
-                        }
-                        if (target_path.isValid()) {
-                            PeonyNavigationWindow *w = new PeonyNavigationWindow(target_path, nullptr);
-                            w->resize(1000, 618);
-                            w->show();
-                        }
+                        target_path = Fm::FilePath::fromUri(path.toUtf8());
+                        if (target_path.isValid())
+                            isDir = true;
                     }
+                    GFile *file = target_path.gfile().get();
+                    if (g_file_query_file_type (file, G_FILE_QUERY_INFO_NONE, nullptr) != G_FILE_TYPE_DIRECTORY)
+                        isDir = false;
+                    if (!isDir) {
+                        QMessageBox *msgBox = new QMessageBox;//(tr("Error"), tr("Can not find directory"));
+                        msgBox->setWindowTitle(tr("ERROR"));
+                        msgBox->setWindowIcon(QIcon::fromTheme("gtk-error"));
+                        msgBox->setText(tr("Can not find directory: ") + path);
+                        msgBox->show();
+                        continue;
+                    }
+                    PeonyNavigationWindow *w = new PeonyNavigationWindow(target_path, nullptr);
+                    w->resize(1000, 618);
+                    w->show();
                 }
             } else {
                 //go home
