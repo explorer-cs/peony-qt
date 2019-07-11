@@ -9,6 +9,7 @@
 #include "peony-navigation-window.h"
 #include "peony-tool-bar.h"
 #include "dbusinterface.h"
+#include "peony-desktop-window.h"
 
 #include <libfm-qt/filepropsdialog.h>
 
@@ -93,12 +94,20 @@ void PeonyApplication::parseCmd(QStringList cmd)
     QCommandLineOption deamonOption(QStringList()<<"d"<<"deamon", tr("Run application as a 'Deamon', this option only effect primary application"));
     parser.addOption(deamonOption);
 
+    //test func
+    QCommandLineOption desktopOption(QStringList()<<"f"<<"force-desktop", tr("Manage desktop"));
+    parser.addOption(desktopOption);
+
     parser.addPositionalArgument("files", tr("Files or directories to open"), tr("[FILE1, FILE2,...]"));
 
     if (this->isPrimary()) {
         parser.process(cmd);
         if (parser.isSet(quitOption))
             qApp->quit();
+        else if (parser.isSet(desktopOption)) {
+            PeonyDesktopWindow *w = new PeonyDesktopWindow;
+            w->show();
+        }
         else if (parser.isSet(deamonOption)) {
             this->setQuitOnLastWindowClosed(false);
             if (m_dbus_iface == nullptr) {
