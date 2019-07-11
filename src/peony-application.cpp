@@ -114,41 +114,38 @@ void PeonyApplication::parseCmd(QStringList cmd)
                 });
                 //real show items
                 //this is used mostly for web browser.
-                //TODO: select files when show items
                 connect(m_dbus_iface, &DBusInterface::showItemsRequest, [=](const QStringList urlList){
                     //Fm::FileInfoList infos;
                     for (QString uri : urlList) {
                         Fm::FilePath path = Fm::FilePath::fromUri(uri.toUtf8());
-                        /*
-                        Fm::GFileInfoPtr info_ptr{g_file_query_info(path.gfile().get(), "standard::*", G_FILE_QUERY_INFO_NONE, nullptr, nullptr), true};
-                        Fm::FileInfo info;
-                        info.setFromGFileInfo(info_ptr, path, path.parent());
-                        std::shared_ptr<Fm::FileInfo> inf = std::shared_ptr<Fm::FileInfo>(&info);
-                        infos.push_back(inf);
-                        */
                         PeonyNavigationWindow *w = new PeonyNavigationWindow(path.parent());
-                        //w->setSelectedFile(path);
+                        //we can not set selection right now. because model may not finish loading.
+                        //try do this with a half second delay, it is convinient, but not a regular way.
+                        QTimer::singleShot(500, [=]{
+                            qDebug()<<"tring to selecte:"<<path.uri().get();
+                            w->setSelectedFile(path);
+                        });
                         w->resize(1000, 618);
                         w->show();
                     }
                 });
                 //real show item properties
                 connect(m_dbus_iface, &DBusInterface::showItemPropertiesRequest, [=](const QStringList &urlList){
-                    /*
-                    Fm::FileInfoList infos;
                     for (QString uri : urlList) {
+                        Fm::CachedFolderModel *cache_model = nullptr;
+                        Fm::ProxyFolderModel *proxy_model = new Fm::ProxyFolderModel;
                         Fm::FilePath path = Fm::FilePath::fromUri(uri.toUtf8());
-                        Fm::GFileInfoPtr info_ptr{g_file_query_info(path.gfile().get(), "standard::*", G_FILE_QUERY_INFO_NONE, nullptr, nullptr), true};
-                        Fm::FileInfo info;
-                        info.setFromGFileInfo(info_ptr, path, path.parent());
-                        std::shared_ptr<Fm::FileInfo> inf = std::shared_ptr<Fm::FileInfo>(&info);
-                        infos.push_back(inf);
+                        cache_model->modelFromPath(path.parent());
+                        proxy_model->setSourceModel(cache_model);
+                        QTimer::singleShot(500, [=](){
+                            auto info = proxy_model->fileInfoFromPath(path);
+                            Fm::FilePropsDialog::showForFile(info);
+                        });
                     }
-                    Fm::FilePropsDialog::showForFiles(infos);
-                    */
                 });
             }
         } else {
+            //get file args from secondary application.
             if (!parser.positionalArguments().isEmpty()) {
                 qDebug()<<parser.positionalArguments();
                 for (QString path : parser.positionalArguments()) {
@@ -164,6 +161,7 @@ void PeonyApplication::parseCmd(QStringList cmd)
                     GFile *file = target_path.gfile().get();
                     if (g_file_query_file_type (file, G_FILE_QUERY_INFO_NONE, nullptr) != G_FILE_TYPE_DIRECTORY)
                         isDir = false;
+                    g_object_unref(file);
                     if (!isDir) {
                         QMessageBox *msgBox = new QMessageBox;//(tr("Error"), tr("Can not find directory"));
                         msgBox->setWindowTitle(tr("ERROR"));

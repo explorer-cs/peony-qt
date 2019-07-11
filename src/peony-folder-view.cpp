@@ -126,6 +126,17 @@ void PeonyFolderView::onFileClicked(int type, const std::shared_ptr<const Fm::Fi
     }
 }
 
+void PeonyFolderView::setSelectedFile(const Fm::FilePath &path)
+{
+    m_model->setFolder(Fm::Folder::fromPath(path.parent()));
+    QModelIndex index = m_proxy_model->indexFromPath(path);
+    qDebug()<<index;
+    auto info = m_proxy_model->fileInfoFromPath(path);
+    Fm::FileInfoList l;
+    l.push_back(info);
+    this->selectFiles(l);
+}
+
 void PeonyFolderView::reload()
 {
     folder()->reload();

@@ -447,13 +447,7 @@ void PeonyNavigationWindow::showHistoryMenu(QAction *, QMenu *historyMenu)
 //this method should be corrected.
 void PeonyNavigationWindow::setSelectedFile(const Fm::FilePath &path)
 {
-    Fm::FileInfoList infos;
-    Fm::GFileInfoPtr info_ptr{g_file_query_info(path.gfile().get(), "standard::*", G_FILE_QUERY_INFO_NONE, nullptr, nullptr), false};
-    Fm::FileInfo info;
-    info.setFromGFileInfo(info_ptr, path, path.parent());
-    std::shared_ptr<Fm::FileInfo> inf = std::shared_ptr<Fm::FileInfo>(&info);
-    infos.push_back(inf);
-    m_folder_view->selectFiles(infos);
+    m_folder_view->setSelectedFile(path);
 }
 
 //file operation

@@ -17,6 +17,7 @@ public:
 public Q_SLOTS:
     void onFileClicked(int type, const std::shared_ptr<const Fm::FileInfo>& fileInfo) override;
     void reload();
+    void setSelectedFile(const Fm::FilePath &path);
 
 Q_SIGNALS:
     //void updatePathBarRequest(const Fm::FilePath path);
