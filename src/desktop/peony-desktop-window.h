@@ -19,10 +19,10 @@ public:
     explicit PeonyDesktopWindow(QWidget *parent = nullptr);
     ~PeonyDesktopWindow() override;
 
-    //void setBackgroundPath(QString path);
+    void setBackgroundPath(QString path);
 
 protected:
-    //void paintEvent(QPaintEvent *e) override;
+    void paintEvent(QPaintEvent *e) override;
     void dropEvent(QDropEvent *e) override;
 
 private:
@@ -30,6 +30,8 @@ private:
 
     QString bg_path = nullptr;
     QString new_bg_path = nullptr;
+
+    int process_count = -1;
 
     //FolderModel need to be replaced by a dirved class.
     //at least, we need insert "trash, computer and personal directory"
