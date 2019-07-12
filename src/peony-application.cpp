@@ -99,7 +99,9 @@ void PeonyApplication::parseCmd(QStringList cmd)
     QCommandLineOption quitOption(QStringList()<<"q"<<"quit", tr("Close all peony-qt windows and quit"));
     parser.addOption(quitOption);
 
-    QCommandLineOption deamonOption(QStringList()<<"d"<<"deamon", tr("Run application as a 'Deamon', this option only effect primary application"));
+    QCommandLineOption deamonOption(QStringList()<<"d"<<"deamon", tr("Run application as a 'Deamon', this option only effect primary application. "
+                                                                     "If you have running a primary peony-qt application yet, and it is not in a deamon mode. "
+                                                                     "this secondary application will let primary one become a deamon applicaiton"));
     parser.addOption(deamonOption);
 
     //test func
@@ -112,11 +114,13 @@ void PeonyApplication::parseCmd(QStringList cmd)
         parser.process(cmd);
         if (parser.isSet(quitOption))
             qApp->quit();
-        else if (parser.isSet(desktopOption)) {
-            PeonyDesktopWindow *w = new PeonyDesktopWindow;
-            w->show();
-        }
         else if (parser.isSet(deamonOption)) {
+            //a deamon application might aslo manage desktop.
+            if (parser.isSet(desktopOption)) {
+                PeonyDesktopWindow *w = new PeonyDesktopWindow;
+                w->show();
+            }
+
             this->setQuitOnLastWindowClosed(false);
             if (m_dbus_iface == nullptr) {
                 qDebug()<<"tring to register dbus service";
@@ -161,7 +165,12 @@ void PeonyApplication::parseCmd(QStringList cmd)
                     }
                 });
             }
-        } else {
+        } else if (parser.isSet(desktopOption)) {
+            //only manage desktop, not take over freedesktop dbus service
+            PeonyDesktopWindow *w = new PeonyDesktopWindow;
+            w->show();
+        }
+        else {
             //get file args from secondary application.
             if (!parser.positionalArguments().isEmpty()) {
                 qDebug()<<parser.positionalArguments();
