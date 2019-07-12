@@ -30,6 +30,8 @@ public:
     void initTranslation();
     void parseCmd(QStringList cmd);
 
+    static void openNewWindow(const char* uri);
+
 private:
     DBusInterface *m_dbus_iface = nullptr;
 };

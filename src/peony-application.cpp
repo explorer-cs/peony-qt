@@ -71,6 +71,14 @@ PeonyApplication::~PeonyApplication()
         delete m_dbus_iface;
 }
 
+void PeonyApplication::openNewWindow(const char *uri)
+{
+    Fm::FilePath path = Fm::FilePath::fromUri(uri);
+    PeonyNavigationWindow *w = new PeonyNavigationWindow(path);
+    w->resize(1000, 618);
+    w->show();
+}
+
 void PeonyApplication::initTranslation()
 {
     if (is_translator_installed)
