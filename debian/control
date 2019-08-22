@@ -1,0 +1,26 @@
+Source: peony-qt
+Section: utils
+Priority: optional
+Maintainer: Yue Lan <>
+Build-Depends: debhelper (>=11~), qt5-qmake, qtbase5-dev, qtbase5-dev-tools, libglib2.0-dev
+Standards-Version: 4.4.0
+Homepage: https://github.com/explorer-cs/peony-qt
+
+Package: libpeony-qt
+Section: libs
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends}, ${shlibs:Depends}, libglib2.0-0, libqt5widgets5
+Recommends: gvfs-backends, qt5-gtk2-platformtheme, qt5-gtk-platformtheme
+Description: PeonyQt is the file-manager of UKUI3.0
+ This pakage provide the libraries which peony-qt requires.
+
+Package: libpeony-qt-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends: libpeony-qt
+Description: PeonyQt is the file-manager of UKUI3.0
+ This pakage provide the development files which peony-qt requires.
+ It also can be used for other projects about qt/gio-based file-manager.
+

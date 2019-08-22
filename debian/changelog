@@ -1,0 +1,7 @@
+peony-qt (0.1) eoan; urgency=low
+
+  * Initial release. Closes: #nnnn
+    <nnnn is the bug number of your ITP>
+  * 
+
+ -- Yue Lan <lanyue@kylinos.cn>  Thu, 22 Aug 2019 15:55:01 +0800
