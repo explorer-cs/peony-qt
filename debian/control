@@ -1,8 +1,8 @@
 Source: peony-qt
 Section: utils
 Priority: optional
-Maintainer: Yue Lan <>
-Build-Depends: debhelper (>=11~), qt5-qmake, qtbase5-dev, qtbase5-dev-tools, libglib2.0-dev
+Maintainer: Yue Lan <lanyue@kylinos.cn>
+Build-Depends: debhelper (>=11~), pkg-config, qt5-qmake, qtbase5-dev, qtchooser, qtbase5-dev-tools, libglib2.0-dev, libqt5x11extras5-dev 
 Standards-Version: 4.4.0
 Homepage: https://github.com/explorer-cs/peony-qt
 
