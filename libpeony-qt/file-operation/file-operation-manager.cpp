@@ -6,6 +6,7 @@
 #include "file-delete-operation.h"
 #include "file-link-operation.h"
 #include "file-move-operation.h"
+#include "file-rename-operation.h"
 #include "file-trash-operation.h"
 #include "file-untrash-operation.h"
 
@@ -69,6 +70,9 @@ void FileOperationManager::startOperation(FileOperation *operation, bool addToHi
     wizard->connect(operation, &FileOperation::operationRollbackedOne, wizard, &FileOperationProgressWizard::onFileRollbacked);
     wizard->connect(operation, &FileOperation::operationFinished, wizard, &FileOperationProgressWizard::deleteLater);
 
+    connect(wizard, &Peony::FileOperationProgressWizard::cancelled,
+            operation, &Peony::FileOperation::cancel);
+
     operation->connect(operation, &FileOperation::errored, [=](){
         operation->setHasError(true);
     });
@@ -117,7 +121,8 @@ void FileOperationManager::startUndoOrRedo(std::shared_ptr<FileOperationInfo> in
         break;
     }
     case FileOperationInfo::Rename: {
-        //rename
+        op = new FileRenameOperation(info->m_src_uris.isEmpty()? nullptr: info->m_src_uris.at(0),
+                                     info->m_dest_dir_uri);
         break;
     }
     case FileOperationInfo::Trash: {
@@ -131,6 +136,10 @@ void FileOperationManager::startUndoOrRedo(std::shared_ptr<FileOperationInfo> in
     default:
         break;
     }
+    //do not record the undo/redo operation to history again.
+    //this had been handled at undo() and redo() yet.
+    //FIXME: if an undo/redo work went error (usually won't),
+    //should i remove the operation info from stack?
     if (op) {
         startOperation(op, false);
     }
@@ -158,7 +167,9 @@ std::shared_ptr<FileOperationInfo> FileOperationManager::getRedoInfo()
 
 void FileOperationManager::undo()
 {
-    Q_ASSERT(canUndo());
+    if(!canUndo())
+        return;
+
     auto undoInfo = m_undo_stack.pop();
     m_redo_stack.push(undoInfo);
 
@@ -168,8 +179,11 @@ void FileOperationManager::undo()
 
 void FileOperationManager::redo()
 {
-    Q_ASSERT(canRedo());
+    if (!canRedo())
+        return;
+
     auto redoInfo = m_redo_stack.pop();
+    m_undo_stack.push(redoInfo);
 
     startUndoOrRedo(redoInfo);
 }

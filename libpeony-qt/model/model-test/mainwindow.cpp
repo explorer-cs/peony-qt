@@ -20,11 +20,18 @@
 #include <QDebug>
 #include <QHeaderView>
 
+#include <QAction>
+
 #include "file-info-manager.h"
+#include "file-operation-manager.h"
+
+#define TEST
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+#ifndef TEST
+#define TEST
     QLineEdit *line = new QLineEdit("file:///home/lanyue", this);
     QToolBar *toolbar = new QToolBar(this);
     toolbar->addWidget(line);
@@ -103,6 +110,23 @@ MainWindow::MainWindow(QWidget *parent)
         //lv->setUniformItemSizes(true);
         lv->setWordWrap(true);
 
+        //undo redo action
+        QAction *undoAction = new QAction(QIcon::fromTheme("undo"), tr("undo"), lv);
+        undoAction->setShortcut(QKeySequence::Undo);
+        QAction *redoAction = new QAction(QIcon::fromTheme("redo"), tr("redo"), lv);
+        redoAction->setShortcut(QKeySequence::Redo);
+        connect(undoAction, &QAction::triggered, [=](){
+            auto fileOpMgr = Peony::FileOperationManager::getInstance();
+            fileOpMgr->undo();
+        });
+        connect(redoAction, &QAction::triggered, [=](){
+            auto fileOpMgr = Peony::FileOperationManager::getInstance();
+            fileOpMgr->redo();
+        });
+
+        lv->addAction(undoAction);
+        lv->addAction(redoAction);
+
         connect(lv, &QListView::doubleClicked, [=](const QModelIndex &index){
             lv->setWindowTitle(index.data().toString());
             model->setRootIndex(index);
@@ -164,7 +188,7 @@ MainWindow::MainWindow(QWidget *parent)
 */
 
     });
-
+#endif
 }
 
 MainWindow::~MainWindow()
