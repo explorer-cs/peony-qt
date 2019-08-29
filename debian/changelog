@@ -1,3 +1,9 @@
+peony-qt (0.8) eoan; urgency=medium
+
+  * add search vfs extension.
+
+ -- Yue Lan <lanyue@kylinos.cn>  Thu, 29 Aug 2019 15:10:37 +0800
+
 peony-qt (0.7) eoan; urgency=medium
 
   * modify the api.
