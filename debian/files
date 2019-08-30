@@ -1,1 +1,4 @@
-peony-qt_0.8_source.buildinfo utils optional
+libpeony-qt-dbgsym_0.8_amd64.ddeb debug optional automatic=yes
+libpeony-qt-dev_0.8_amd64.deb libdevel optional
+libpeony-qt_0.8_amd64.deb libs optional
+peony-qt_0.8_amd64.buildinfo utils optional
