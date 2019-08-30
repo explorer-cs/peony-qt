@@ -1,7 +1,11 @@
 #ifndef SEARCHVFSREGISTER_H
 #define SEARCHVFSREGISTER_H
 
-class SearchVFSRegister
+#include "peony-core_global.h"
+
+namespace Peony {
+
+class PEONYCORESHARED_EXPORT SearchVFSRegister
 {
 public:
     static void registSearchVFS();
@@ -9,5 +13,7 @@ public:
 private:
     SearchVFSRegister();
 };
+
+}
 
 #endif // SEARCHVFSREGISTER_H

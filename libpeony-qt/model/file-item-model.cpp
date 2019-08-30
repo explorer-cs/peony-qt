@@ -39,7 +39,7 @@ void FileItemModel::setRootUri(const QString &uri)
 void FileItemModel::setRootItem(FileItem *item)
 {
     beginResetModel();
-    delete m_root_item;
+    m_root_item->deleteLater();
 
     m_root_item = item;
     m_root_item->findChildrenAsync();
@@ -156,12 +156,8 @@ QVariant FileItemModel::data(const QModelIndex &index, int role) const
             /**
               \todo handle the desktop file icon
               */
-            //qDebug()<<item->m_info->iconName();
-            QIcon icon = QIcon::fromTheme(item->m_info->iconName());
-            if (icon.isNull()) {
-                return QIcon::fromTheme("application-x-desktop");
-            }
-            return QVariant(QIcon::fromTheme(item->m_info->iconName()));
+            QIcon icon = QIcon::fromTheme(item->m_info->iconName(), QIcon::fromTheme("text-x-generic"));
+            return QVariant(icon);
         }
         case Qt::ToolTipRole: {
             return QVariant(item->m_info->displayName());
