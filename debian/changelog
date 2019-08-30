@@ -1,3 +1,9 @@
+peony-qt (0.9) eoan; urgency=medium
+
+  * improve the search vfs function. update version to v0.9.
+
+ -- Yue Lan <lanyue@kylinos.cn>  Fri, 30 Aug 2019 15:23:42 +0800
+
 peony-qt (0.8) eoan; urgency=medium
 
   * add search vfs extension.
