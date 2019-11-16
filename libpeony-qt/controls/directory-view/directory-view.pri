@@ -8,4 +8,5 @@ HEADERS += \
     $$PWD/directory-view-container.h
 
 SOURCES += \
-    $$PWD/directory-view-container.cpp
+    $$PWD/directory-view-container.cpp \
+    $$PWD/directory-view.cpp

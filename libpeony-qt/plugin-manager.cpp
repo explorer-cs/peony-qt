@@ -5,6 +5,7 @@
 #include "preview-page-factory-manager.h"
 
 #include "directory-view-plugin-iface.h"
+#include "directory-view-plugin-iface2.h"
 #include "preview-page-plugin-iface.h"
 #include "style-plugin-iface.h"
 
@@ -73,6 +74,13 @@ PluginManager::PluginManager(QObject *parent) : QObject(parent)
               */
             auto styleProvider = dynamic_cast<StylePluginIface*>(plugin);
             QApplication::setStyle(styleProvider->getStyle());
+            break;
+        }
+        case PluginInterface::DirectoryViewPlugin2: {
+            auto p = dynamic_cast<DirectoryViewPluginIface2*>(plugin);
+            auto w = new DirectoryView;
+            w->setAttribute(Qt::WA_DeleteOnClose);
+            p->fillDirectoryView(w);
             break;
         }
         default:
