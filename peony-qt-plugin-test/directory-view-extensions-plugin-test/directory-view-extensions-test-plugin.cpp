@@ -12,9 +12,14 @@ DirectoryViewExtensionsTestPlugin::DirectoryViewExtensionsTestPlugin(QObject *pa
 
 }
 
-void DirectoryViewExtensionsTestPlugin::fillDirectoryView(DirectoryViewWidget *view)
+//void DirectoryViewExtensionsTestPlugin::fillDirectoryView(DirectoryViewWidget *view)
+//{
+//    auto layout = new QVBoxLayout(view);
+//    layout->addWidget(new QLabel("test icon view", nullptr));
+//    view->setLayout(layout);
+//}
+
+DirectoryViewWidget *DirectoryViewExtensionsTestPlugin::create()
 {
-    auto layout = new QVBoxLayout(view);
-    layout->addWidget(new QLabel("test icon view", nullptr));
-    view->setLayout(layout);
+    return new DirectoryViewWidget;
 }

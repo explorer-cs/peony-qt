@@ -15,6 +15,7 @@ class FileItemModel;
 class FileItemProxyFilterSortModel;
 
 class DirectoryViewProxyIface;
+class DirectoryViewWidget;
 
 /*!
  * \brief The DirectoryViewContainer class
@@ -52,12 +53,14 @@ public:
     FileItemModel::ColumnType getSortType();
     Qt::SortOrder getSortOrder();
 
-    DirectoryViewProxyIface *getProxy() {return m_proxy;}
+    //DirectoryViewProxyIface *getProxy() {return m_proxy;}
+    DirectoryViewWidget *getView() {return m_view;}
 
 Q_SIGNALS:
     void viewTypeChanged();
     void directoryChanged();
     void selectionChanged();
+    void viewDoubleClicked(const QString &uri);
     void updateWindowLocationRequest(const QString &uri, bool addHistory, bool forceUpdate = false);
 
     void menuRequest(const QPoint &pos);
@@ -94,6 +97,7 @@ private:
     QString m_current_uri;
 
     DirectoryViewProxyIface *m_proxy = nullptr;
+    DirectoryViewWidget *m_view = nullptr;
 
     QStringList m_back_list;
     QStringList m_forward_list;

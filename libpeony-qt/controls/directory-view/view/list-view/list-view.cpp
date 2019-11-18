@@ -8,6 +8,8 @@
 
 #include <QHeaderView>
 
+#include <QVBoxLayout>
+
 #include <QDebug>
 
 using namespace Peony;
@@ -225,4 +227,43 @@ void ListView::editUris(const QStringList uris)
 {
     //FIXME:
     //implement batch rename.
+}
+
+//List View 2
+ListView2::ListView2(QWidget *parent) : DirectoryViewWidget(parent)
+{
+    auto layout = new QVBoxLayout(this);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    m_view = new ListView(this);
+    layout->addWidget(m_view);
+
+    connect(m_view->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &DirectoryViewWidget::viewSelectionChanged);
+
+    connect(m_view, &ListView::doubleClicked, this, [=](const QModelIndex &index){
+        Q_EMIT this->viewDoubleClicked(index.data(Qt::UserRole).toString());
+    });
+
+    connect(m_view, &ListView::customContextMenuRequested,
+            this, &DirectoryViewWidget::menuRequest);
+
+    setLayout(layout);
+}
+
+ListView2::~ListView2()
+{
+
+}
+
+void ListView2::bindModel(FileItemModel *model, FileItemProxyFilterSortModel *proxyModel)
+{
+    disconnect(m_model);
+    disconnect(m_proxy_model);
+    m_model = model;
+    m_proxy_model = proxyModel;
+
+    m_view->bindModel(model, proxyModel);
+    connect(model, &FileItemModel::findChildrenFinished, this, &DirectoryViewWidget::viewDirectoryChanged);
+    connect(m_model, &FileItemModel::updated, m_view, &ListView::resort);
 }

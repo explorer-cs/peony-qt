@@ -2,6 +2,7 @@
 #include "directory-view-container.h"
 #include "directory-view-factory-manager.h"
 #include "directory-view-plugin-iface.h"
+#include "directory-view-widget.h"
 #include "file-info.h"
 #include "file-utils.h"
 
@@ -50,14 +51,14 @@ void TabPage::addPage(const QString &uri)
 {
     auto container = new DirectoryViewContainer(this);
     container->switchViewType(DirectoryViewFactoryManager::getInstance()->getDefaultViewId());
-    container->getProxy()->setDirectoryUri(uri);
-    container->getProxy()->beginLocationChange();
+    container->getView()->setDirectoryUri(uri);
+    container->getView()->beginLocationChange();
 
     addTab(container,
            QIcon::fromTheme(FileUtils::getFileIconName(uri), QIcon::fromTheme("folder")),
            FileUtils::getFileDisplayName(uri));
 
-    rebindContainer();
+    //rebindContainer();
 }
 
 void TabPage::rebindContainer()
@@ -67,24 +68,24 @@ void TabPage::rebindContainer()
     }
 
     auto container = getActivePage();
-    container->connect(container->getProxy(), &Peony::DirectoryViewProxyIface::viewDoubleClicked, [=](const QString &uri){
-        if (m_double_click_limiter.isActive())
-            return;
+//    container->connect(container->getProxy(), &Peony::DirectoryViewProxyIface::viewDoubleClicked, [=](const QString &uri){
+//        if (m_double_click_limiter.isActive())
+//            return;
 
-        m_double_click_limiter.start(500);
+//        m_double_click_limiter.start(500);
 
-        qDebug()<<"double clicked"<<uri;
-        auto info = Peony::FileInfo::fromUri(uri, false);
-        if (info->uri().startsWith("trash://")) {
-            //FIXME: open properties window
-            return;
-        }
-        if (info->isDir() || info->isVolume() || info->isVirtual()) {
-            Q_EMIT this->updateWindowLocationRequest(uri);
-        } else {
-            FileLaunchManager::openAsync(uri);
-        }
-    });
+//        qDebug()<<"double clicked"<<uri;
+//        auto info = Peony::FileInfo::fromUri(uri, false);
+//        if (info->uri().startsWith("trash://")) {
+//            //FIXME: open properties window
+//            return;
+//        }
+//        if (info->isDir() || info->isVolume() || info->isVirtual()) {
+//            Q_EMIT this->updateWindowLocationRequest(uri);
+//        } else {
+//            FileLaunchManager::openAsync(uri);
+//        }
+//    });
 
     container->connect(container, &DirectoryViewContainer::updateWindowLocationRequest,
                        this, &TabPage::updateWindowLocationRequest);

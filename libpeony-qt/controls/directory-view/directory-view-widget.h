@@ -50,7 +50,7 @@ public Q_SLOTS:
     virtual void bindModel(FileItemModel *model, FileItemProxyFilterSortModel *proxyModel) {}
 
     //location
-    virtual void open(const QStringList &uris, bool newWindow) {}
+    //virtual void open(const QStringList &uris, bool newWindow) {}
     virtual void setDirectoryUri(const QString &uri) {}
     virtual void beginLocationChange() {}
     virtual void stopLocationChange() {}

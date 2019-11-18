@@ -27,9 +27,9 @@ public:
     QIcon viewIcon() override {return QIcon::fromTheme("view-grid-symbolic", QIcon::fromTheme("folder"));}
     bool supportUri(const QString &uri) override {return !uri.isEmpty();}
 
-    void fillDirectoryView(DirectoryViewWidget *view) override;
+    //void fillDirectoryView(DirectoryViewWidget *view) override;
 
-    DirectoryViewWidget *create() override {return nullptr;}
+    DirectoryViewWidget *create() override;
 
     int zoom_level_hint() override {return 100;}
     int priority(const QString &) override {return 0;}
