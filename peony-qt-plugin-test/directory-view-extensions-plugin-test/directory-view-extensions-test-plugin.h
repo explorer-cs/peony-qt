@@ -29,6 +29,8 @@ public:
 
     void fillDirectoryView(DirectoryViewWidget *view) override;
 
+    DirectoryViewWidget *create() override {return nullptr;}
+
     int zoom_level_hint() override {return 100;}
     int priority(const QString &) override {return 0;}
 };

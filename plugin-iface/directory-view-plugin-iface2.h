@@ -25,6 +25,8 @@ public:
     virtual int priority(const QString &directoryUri) = 0;
 
     virtual void fillDirectoryView(DirectoryViewWidget *view) = 0;
+
+    virtual DirectoryViewWidget *create() = 0;
 };
 
 }
