@@ -12,6 +12,8 @@
 #include "properties-window.h" //properties factory manager define is in this header
 #include "properties-window-tab-page-plugin-iface.h"
 
+#include "directory-view-widget.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QPluginLoader>
@@ -78,9 +80,9 @@ PluginManager::PluginManager(QObject *parent) : QObject(parent)
         }
         case PluginInterface::DirectoryViewPlugin2: {
             auto p = dynamic_cast<DirectoryViewPluginIface2*>(plugin);
-            auto w = new DirectoryView;
-            w->setAttribute(Qt::WA_DeleteOnClose);
+            auto w = new DirectoryViewWidget;
             p->fillDirectoryView(w);
+            w->show();
             break;
         }
         default:
