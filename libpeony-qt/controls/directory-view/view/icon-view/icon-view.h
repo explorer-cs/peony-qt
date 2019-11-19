@@ -136,7 +136,7 @@ public:
     explicit IconView2(QWidget *parent = nullptr);
     ~IconView2();
 
-    const QString viewId() {return tr("Icon View 2");}
+    const QString viewId() {return tr("Icon View2");}
 
     //location
     const QString getDirectoryUri() {return m_view->getDirectoryUri();}

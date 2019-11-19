@@ -85,6 +85,8 @@ public Q_SLOTS:
     void setSortFilter(int FileTypeIndex, int FileMTimeIndex, int FileSizeIndex);
     void setShowHidden(bool showHidden = false);
 
+    void onViewDoubleClicked(const QString &uri);
+
 protected:
     /*!
      * \brief bindNewProxy

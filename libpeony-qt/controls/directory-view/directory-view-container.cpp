@@ -181,6 +181,7 @@ void DirectoryViewContainer::switchViewType(const QString &viewId)
         sortOrder = oldView->getSortOrder();
         selection = oldView->getSelections();
         m_layout->removeWidget(dynamic_cast<QWidget*>(oldView));
+        oldView->deleteLater();
     }
     auto view = factory->create();
     m_view = view;
@@ -194,6 +195,7 @@ void DirectoryViewContainer::switchViewType(const QString &viewId)
     connect(m_view, &DirectoryViewWidget::menuRequest, this, &DirectoryViewContainer::menuRequest);
     connect(m_view, &DirectoryViewWidget::viewDirectoryChanged, this, &DirectoryViewContainer::directoryChanged);
     connect(m_view, &DirectoryViewWidget::viewDoubleClicked, this, &DirectoryViewContainer::viewDoubleClicked);
+    connect(m_view, &DirectoryViewWidget::viewDoubleClicked, this, &DirectoryViewContainer::onViewDoubleClicked);
 
     //m_proxy->switchView(view);
     m_layout->addWidget(dynamic_cast<QWidget*>(view), Qt::AlignBottom);
@@ -295,4 +297,9 @@ void DirectoryViewContainer::setSortOrder(Qt::SortOrder order)
     if (!m_view)
         return;
     m_view->setSortOrder(order);
+}
+
+void DirectoryViewContainer::onViewDoubleClicked(const QString& uri)
+{
+
 }

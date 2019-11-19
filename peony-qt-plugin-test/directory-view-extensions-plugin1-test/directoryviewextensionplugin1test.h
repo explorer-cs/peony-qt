@@ -7,6 +7,13 @@
 
 namespace Peony {
 
+/*!
+ * \brief The DirectoryViewExtensionPlugin1Test class
+ * \deprecated
+ * This interface is deprecated.
+ * To make a directory view extension,
+ * you have to implement DirectoryViewPluginIface2, not this.
+ */
 class DIRECTORYVIEWEXTENSIONSPLUGIN1TESTSHARED_EXPORT DirectoryViewExtensionPlugin1Test : public QObject, public DirectoryViewPluginIface
 {
     Q_OBJECT

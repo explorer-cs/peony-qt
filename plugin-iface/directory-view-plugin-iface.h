@@ -51,6 +51,14 @@ class FileItemProxyFilterSortModel;
  *
  * 3. DirectoryViewProxyIface
  * \see DirectoryViewProxyIface
+ *
+ * \deprecated
+ * This interface is deprecated.
+ * To make a directory view extension,
+ * you have to implement DirectoryViewPluginIface2, not this.
+ *
+ * \see
+ * DirectoryViewPluginIface2
  */
 class DirectoryViewPluginIface : public PluginInterface
 {
@@ -107,6 +115,14 @@ public:
  * Every DirectoryViewIface instance should have a DirectoryViewProxyIface
  * instance, we usually use this proxy control the view.
  * \see DirectoryViewProxyIface
+ *
+ * \deprecated
+ * This interface is deprecated.
+ * To make a directory view extension,
+ * you have to implement DirectoryViewPluginIface2, not this.
+ *
+ * \see
+ * DirectoryViewPluginIface2
  */
 class DirectoryViewIface
 {
@@ -196,6 +212,14 @@ public:
  * which are used in icon view and list view by default.
  *
  * \see DirectoryViewIface, StandardViewProxy, IconView, ListView.
+ *
+ * \deprecated
+ * This interface is deprecated.
+ * To make a directory view extension,
+ * you have to implement DirectoryViewPluginIface2, not this.
+ *
+ * \see
+ * DirectoryViewPluginIface2
  */
 class DirectoryViewProxyIface: public QObject
 {

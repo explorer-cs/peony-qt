@@ -5,6 +5,8 @@
 
 #include <QVBoxLayout>
 
+#include <QDebug>
+
 using namespace Peony;
 
 DirectoryViewExtensionsTestPlugin::DirectoryViewExtensionsTestPlugin(QObject *parent) : QObject(parent)
@@ -21,5 +23,11 @@ DirectoryViewExtensionsTestPlugin::DirectoryViewExtensionsTestPlugin(QObject *pa
 
 DirectoryViewWidget *DirectoryViewExtensionsTestPlugin::create()
 {
-    return new DirectoryViewWidget;
+    qDebug()<<"create directory view";
+    auto w = new DirectoryViewWidget;
+    auto layout = new QVBoxLayout(w);
+    layout->addWidget(new QLabel("test directory view", w));
+    w->setLayout(layout);
+
+    return w;
 }
