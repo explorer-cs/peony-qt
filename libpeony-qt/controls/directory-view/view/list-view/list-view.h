@@ -23,6 +23,7 @@ namespace DirectoryView {
  */
 class PEONYCORESHARED_EXPORT ListView : public QTreeView, public DirectoryViewIface
 {
+    friend class ListView2;
     Q_OBJECT
 public:
     explicit ListView(QWidget *parent = nullptr);

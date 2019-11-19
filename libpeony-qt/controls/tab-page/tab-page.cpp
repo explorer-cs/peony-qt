@@ -58,7 +58,7 @@ void TabPage::addPage(const QString &uri)
            QIcon::fromTheme(FileUtils::getFileIconName(uri), QIcon::fromTheme("folder")),
            FileUtils::getFileDisplayName(uri));
 
-    //rebindContainer();
+    rebindContainer();
 }
 
 void TabPage::rebindContainer()
@@ -68,24 +68,24 @@ void TabPage::rebindContainer()
     }
 
     auto container = getActivePage();
-//    container->connect(container->getProxy(), &Peony::DirectoryViewProxyIface::viewDoubleClicked, [=](const QString &uri){
-//        if (m_double_click_limiter.isActive())
-//            return;
+    container->connect(container, &Peony::DirectoryViewContainer::viewDoubleClicked, [=](const QString &uri){
+        if (m_double_click_limiter.isActive())
+            return;
 
-//        m_double_click_limiter.start(500);
+        m_double_click_limiter.start(500);
 
-//        qDebug()<<"double clicked"<<uri;
-//        auto info = Peony::FileInfo::fromUri(uri, false);
-//        if (info->uri().startsWith("trash://")) {
-//            //FIXME: open properties window
-//            return;
-//        }
-//        if (info->isDir() || info->isVolume() || info->isVirtual()) {
-//            Q_EMIT this->updateWindowLocationRequest(uri);
-//        } else {
-//            FileLaunchManager::openAsync(uri);
-//        }
-//    });
+        qDebug()<<"double clicked"<<uri;
+        auto info = Peony::FileInfo::fromUri(uri, false);
+        if (info->uri().startsWith("trash://")) {
+            //FIXME: open properties window
+            return;
+        }
+        if (info->isDir() || info->isVolume() || info->isVirtual()) {
+            Q_EMIT this->updateWindowLocationRequest(uri);
+        } else {
+            FileLaunchManager::openAsync(uri);
+        }
+    });
 
     container->connect(container, &DirectoryViewContainer::updateWindowLocationRequest,
                        this, &TabPage::updateWindowLocationRequest);
