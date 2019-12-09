@@ -1,0 +1,21 @@
+name: B:develop CI
+
+on: [push]
+
+jobs:
+  build:
+    name: develop branch test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: install project dependencies
+      run: |
+        sudo apt update
+        sudo apt install libglib2.0-dev qt5-default libqt5x11extras5-dev libgsettings-qt-dev libpoppler-dev libpoppler-qt5-dev
+    - name: build project
+      run: |
+        qmake .
+        make
+    - name: install project
+      run: sudo make install
